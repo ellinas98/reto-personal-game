@@ -1,0 +1,1365 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#081a3a" />
+  <title>Reto's personal Game</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <style>
+    :root{
+      --bg:#081a3a;         /* dunkelblau */
+      --fg:#f2f6ff;
+      --card:#0f2552;
+      --border:#1c3a7a;
+      --accent:#ffd54a;
+      --accent2:#7ee081;
+      --shadow:rgba(0,0,0,.35);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      margin:0;
+      background:var(--bg);
+      color:var(--fg);
+    }
+
+    .container{
+      max-width:980px;
+      margin:0 auto;
+      padding:18px 14px 28px;
+    }
+
+    h1{margin:10px 0 6px;font-size:24px}
+    .muted{opacity:.78}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .split{justify-content:space-between}
+    .grow{flex:1;min-width:220px}
+
+    .card{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px;
+      margin:12px 0;
+      background:var(--card);
+      box-shadow:0 10px 26px var(--shadow);
+    }
+
+    .stat{
+      border:1px dashed rgba(255,255,255,.25);
+      border-radius:12px;
+      padding:10px 12px;
+      min-width:160px
+    }
+
+    button,input,select,textarea{
+      padding:10px;
+      font-size:14px;
+      color:var(--fg);
+    }
+    input,select,textarea{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:10px;
+      width:100%;
+    }
+    textarea{min-height:110px;resize:vertical}
+    button{
+      cursor:pointer;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.22);
+      border-radius:10px
+    }
+    .danger{border-color:#ff6b6b;color:#ff6b6b}
+    .btn-accent{border:2px solid var(--accent)}
+    .pill{
+      display:inline-block;
+      border:1px solid rgba(255,255,255,.20);
+      border-radius:999px;
+      padding:4px 10px;
+      margin:4px 6px 0 0;
+      font-size:13px
+    }
+    .kbd{
+      border:1px solid rgba(255,255,255,.22);
+      border-bottom-width:3px;
+      border-radius:8px;
+      padding:2px 8px;
+      font-size:12px;
+      opacity:.95;
+      user-select:none;
+    }
+
+    .tabs{display:flex;gap:10px;flex-wrap:wrap}
+    .tabs button.active{background:var(--accent);color:#0b1330;border-color:var(--accent)}
+
+    .q{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;
+      padding:10px;
+      margin:8px 0;
+    }
+    .qtitle{font-weight:700}
+    .qmeta{opacity:.8;font-size:13px;margin-top:4px}
+    .qdesc{opacity:.85;margin-top:2px;line-height:1.35}
+    .hidden{display:none !important}
+
+    /* Modal */
+    .modalBack{
+      position:fixed;inset:0;
+      background:rgba(0,0,0,.55);
+      display:flex;align-items:center;justify-content:center;
+      z-index:9999;
+      padding:16px;
+    }
+    .modal{
+      width:min(760px,96vw);
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px 16px 14px;
+      box-shadow:0 16px 40px rgba(0,0,0,.45);
+    }
+    .titleRow{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    pre.storyBox{
+      white-space:pre-wrap;
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:12px;
+      padding:12px;
+      background:rgba(255,255,255,.04);
+      line-height:1.5;
+      margin:10px 0 0 0;
+    }
+
+    /* Snake */
+    #snakeCanvas{
+      border:2px solid var(--accent);
+      border-radius:10px;
+      image-rendering:pixelated;
+      background:#fff;
+      width:min(320px, 92vw);
+      height:auto;
+      touch-action:none;
+    }
+
+    .hud{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+    /* Mobile controls */
+    .dpad{
+      display:grid;
+      grid-template-columns: 56px 56px 56px;
+      grid-template-rows: 56px 56px 56px;
+      gap:10px;
+      place-items:center;
+      margin-top:10px;
+      user-select:none;
+    }
+    .dpad button{
+      width:56px;height:56px;
+      border:2px solid var(--accent);
+      border-radius:14px;
+      font-size:18px;
+      line-height:1;
+      touch-action:manipulation;
+    }
+    .dpad .empty{visibility:hidden}
+
+    /* Compact stats on small screens */
+    @media (max-width:520px){
+      .stat{min-width:calc(50% - 10px)}
+      h1{font-size:22px}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1 id="appTitle">Reto's personal Game</h1>
+    <div class="muted" id="appSubtitle">Dein Lebens-Game: Quests abschließen, XP sammeln, leveln. Alles bleibt lokal auf deinem Gerät.</div>
+
+    <div class="card">
+      <div class="row split">
+        <div class="tabs" id="tabs">
+          <button data-tab="quests" class="active">🗡️ Quests</button>
+          <button data-tab="story">📜 Geschenk & Story</button>
+          <button data-tab="snake">🐍 Snake</button>
+          <button data-tab="settings">⚙️ Einstellungen</button>
+        </div>
+        <div class="row">
+          <span class="kbd" title="Funktioniert auch offline als PWA">offline/PWA</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Geschenk-Intro Modal -->
+    <div id="giftModalBack" class="modalBack hidden" role="dialog" aria-modal="true">
+      <div class="modal">
+        <div class="titleRow">
+          <div>
+            <div class="muted" id="giftModalAppName">Reto's personal Game</div>
+            <h2 style="margin:.25rem 0 0 0" id="giftModalTitle">🎄 Frohe Weihnachten!</h2>
+          </div>
+          <button id="giftClose" title="Schließen">✕</button>
+        </div>
+
+        <div id="giftModalText" style="margin-top:10px;line-height:1.5"></div>
+        <pre class="storyBox" id="giftModalStory"></pre>
+
+        <div class="row" style="margin-top:14px">
+          <button id="giftStart" class="btn-accent">Los geht’s</button>
+          <button id="giftEdit" style="margin-left:auto">Anpassen</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: QUESTS -->
+    <div id="tab-quests">
+      <div class="card">
+        <div class="row">
+          <div class="stat"><div class="muted">Level</div><div style="font-size:28px" id="level">1</div></div>
+          <div class="stat"><div class="muted">XP</div><div style="font-size:28px"><span id="xp">0</span> / <span id="xpNext">100</span></div></div>
+          <div class="stat"><div class="muted">Coins</div><div style="font-size:28px" id="coins">0</div></div>
+          <div class="stat"><div class="muted">Streak (Tage)</div><div style="font-size:28px" id="streak">0</div></div>
+        </div>
+        <div class="muted" style="margin-top:10px;line-height:1.4">
+          Idee: <b>1 kleine Quest pro Tag</b> reicht. Konsistenz schlägt Perfektion.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row split">
+          <div>
+            <h3 style="margin:0">Quests</h3>
+            <div class="muted" style="margin-top:6px">Generiere Dailies/Weeklies oder erstelle eigene Quests.</div>
+          </div>
+          <div class="row">
+            <button id="newDaily" class="btn-accent">↻ Daily Quests</button>
+            <button id="newWeekly">↻ Weekly Quests</button>
+            <button id="reset" class="danger">Reset</button>
+          </div>
+        </div>
+
+        <div id="questList" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card">
+        <div class="row split">
+          <h3 style="margin:0">Eigene Quests (anpassbar)</h3>
+          <div class="row">
+            <button id="exportBtn">Export</button>
+            <button id="importBtn">Import</button>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <input id="cqTitle" class="grow" placeholder="Titel (z.B. 10 Min Lesen)">
+          <input id="cqDesc" class="grow" placeholder="Beschreibung (optional)">
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <input id="cqTag" placeholder="Tag (z.B. Lernen)" style="max-width:220px">
+          <select id="cqType" style="max-width:160px">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="boss">Boss</option>
+          </select>
+          <input id="cqXP" type="number" min="0" value="30" style="max-width:140px" title="XP">
+          <input id="cqCoins" type="number" min="0" value="5" style="max-width:140px" title="Coins">
+          <button id="cqAdd" class="btn-accent">＋ Hinzufügen</button>
+          <button id="cqCancel" class="danger hidden">Abbrechen</button>
+        </div>
+
+        <div class="muted" style="margin-top:8px">
+          Eigene Quests werden beim Generieren mit Standard-Quests gemischt. Alles bleibt lokal gespeichert.
+        </div>
+
+        <div id="customQuestList" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0">Achievements</h3>
+        <div id="ach"></div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0">Log</h3>
+        <ul id="log" style="margin:0;padding-left:18px"></ul>
+      </div>
+    </div>
+
+    <!-- TAB: STORY / GIFT -->
+    <div id="tab-story" class="hidden">
+      <div class="card">
+        <div class="row split">
+          <div>
+            <h3 style="margin:0">🎁 Weihnachtsgeschenk-Intro</h3>
+            <div class="muted" style="margin-top:6px">
+              Start-Text fürs Geschenk. Später kannst du ihn für jede Person komplett personalisieren oder den Geschenkmodus ganz ausschalten.
+            </div>
+          </div>
+          <div class="row">
+            <button id="storyShow" class="btn-accent">Intro anzeigen</button>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <textarea id="giftMsg"></textarea>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button id="giftMsgSave" class="btn-accent">Speichern</button>
+          <button id="giftMsgReset">Zurücksetzen</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row split">
+          <div>
+            <h3 style="margin:0">📜 Story / Mission (optional)</h3>
+            <div class="muted" style="margin-top:6px">Dieser Text ist wie ein “Quest-Briefing”.</div>
+          </div>
+        </div>
+        <textarea id="giftStory"></textarea>
+
+        <div class="row" style="margin-top:10px">
+          <button id="storySave" class="btn-accent">Speichern</button>
+          <button id="storyReset">Zurücksetzen</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0">Wie es später personalisierbar bleibt</h3>
+        <div class="muted" style="line-height:1.5">
+          In den Einstellungen kannst du Titel/Name ändern und den Geschenkmodus deaktivieren (dann erscheint das Intro nicht mehr).
+          Der App-Inhalt (XP, Quests, Achievements) bleibt trotzdem erhalten.
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SNAKE -->
+    <div id="tab-snake" class="hidden">
+      <div class="card">
+        <div class="row split">
+          <div>
+            <h3 style="margin:0">🐍 Snake (läuft auch auf dem Handy)</h3>
+            <div class="muted" style="margin-top:6px">
+              Steuerung: Pfeile/WASD am Computer – oder D-Pad unten auf dem Smartphone.
+            </div>
+          </div>
+          <div class="row">
+            <span class="pill" id="snakeHighPill">Highscore: 0</span>
+          </div>
+        </div>
+
+        <div class="hud" style="margin-top:10px">
+          <button id="snakeStart" class="btn-accent">▶ Start</button>
+          <button id="snakePause">⏸ Pause</button>
+          <button id="snakeReset">↺ Reset</button>
+          <label class="row" style="gap:6px">
+            <span class="muted">Speed</span>
+            <select id="snakeSpeed">
+              <option value="7">Langsam</option>
+              <option value="10" selected>Normal</option>
+              <option value="14">Schnell</option>
+              <option value="18">Ultra</option>
+            </select>
+          </label>
+          <span class="pill" id="snakeScorePill">Score: 0</span>
+        </div>
+
+        <div class="row" style="margin-top:12px;gap:14px;align-items:flex-start">
+          <canvas id="snakeCanvas" width="320" height="320" aria-label="Snake Spiel"></canvas>
+          <div class="grow" style="min-width:260px">
+            <div class="muted" style="line-height:1.5">
+              Bonus: Wenn du deinen Highscore schlägst, bekommst du XP & Coins.
+            </div>
+            <div class="muted" style="margin-top:10px" id="snakeMsg"></div>
+
+            <div class="dpad" aria-label="Snake D-Pad (Touch)">
+              <span class="empty"></span>
+              <button data-dir="up" aria-label="Up">↑</button>
+              <span class="empty"></span>
+
+              <button data-dir="left" aria-label="Left">←</button>
+              <button data-dir="down" aria-label="Down">↓</button>
+              <button data-dir="right" aria-label="Right">→</button>
+
+              <span class="empty"></span>
+              <span class="empty"></span>
+              <span class="empty"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SETTINGS -->
+    <div id="tab-settings" class="hidden">
+      <div class="card">
+        <h3 style="margin-top:0">⚙️ Einstellungen</h3>
+
+        <div class="row" style="margin-top:10px">
+          <div class="grow">
+            <div class="muted">App-Titel</div>
+            <input id="setTitle" placeholder="z.B. Reto's personal Game">
+          </div>
+          <div class="grow">
+            <div class="muted">Name (z.B. Reto)</div>
+            <input id="setName" placeholder="z.B. Reto">
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <label class="row" style="gap:8px">
+            <input id="setGiftMode" type="checkbox">
+            <span>Geschenkmodus aktiv (Intro beim Start anzeigen)</span>
+          </label>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button id="settingsSave" class="btn-accent">Speichern</button>
+          <button id="openIntro">Intro anzeigen</button>
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,.12);margin:14px 0">
+
+        <h4 style="margin:0 0 6px">🔒 Backup / Gerätewechsel</h4>
+        <div class="muted" style="line-height:1.5">
+          Diese App ist <b>local-first</b>: Daten bleiben auf dem Gerät (LocalStorage). Wenn Reto sie auf einem neuen Handy/Browser nutzen will,
+          braucht er <b>Export → Import</b>.
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button id="exportAll" class="btn-accent">Export (alles)</button>
+          <button id="importAll">Import (alles)</button>
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,.12);margin:14px 0">
+
+        <h4 style="margin:0 0 6px">🌍 Online bereitstellen</h4>
+        <div class="muted" style="line-height:1.5">
+          Du kannst die App gratis online hosten (z.B. GitHub Pages / Netlify). Der Link ist dann erreichbar – aber die Daten bleiben trotzdem lokal pro Gerät.
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ------------------------------
+  // Core config
+  // ------------------------------
+  const DEFAULT_APP_TITLE = "Reto's personal Game";
+  const STORAGE_KEY = "retos_personal_game_v3";
+
+  const el = (id)=>document.getElementById(id);
+  const $ = (q)=>document.querySelector(q);
+  const $$ = (q)=>Array.from(document.querySelectorAll(q));
+
+  function todayISO(){ const d=new Date(); d.setHours(0,0,0,0); return d.toISOString().slice(0,10); }
+  function yesterdayISO(){ const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); }
+  function toInt(v, fallback=0){ const n=parseInt(v,10); return Number.isFinite(n)?n:fallback; }
+  function xpForNext(level){ return 100 + (level-1)*60; }
+
+  // ------------------------------
+  // Text templates (gift)
+  // ------------------------------
+  function defaultGiftMessage(name){
+    const n = (name||"Reto").trim() || "Reto";
+    return `Frohe Weihnachten ${n}! 🎄
+Auf Weihnachten folgt bald ein neues Jahr mit neuen Abenteuern und Missionen. Dazu möchte ich dir dein eigenes Lebens-Game schenken, in dem du dir selbst Ziele setzt und sie entsprechend erreichen kannst.
+Hier ist dein persönlicher Game-Modus – jeden Tag kleine Missionen, XP sammeln und leveln.`;
+  }
+
+  function defaultStory(name){
+    const n = (name||"Held").trim() || "Held";
+    return `Du bist ${n}.
+
+Mission: 2026 (und darüber hinaus).
+
+Dein Auftrag:
+- Setze dir realistische Quests.
+- Erledige jeden Tag mindestens 1 kleine Mission.
+- Sammle XP, level auf – und bleib dran.
+
+Regel #1: Klein & konstant schlägt perfekt.
+Regel #2: Wenn es stressig wird: 1 Mini-Quest statt gar nichts.
+
+Viel Erfolg! 🎄`;
+  }
+
+  // ------------------------------
+  // Achievements
+  // ------------------------------
+  const ACH = {
+    firstQuest: "Erste Quest",
+    quest10: "Der Grind (10 Quests)",
+    boss1: "Boss besiegt (1 Boss-Quest)",
+    streak3: "Streak x3",
+    lvl5: "Level 5",
+    snake5: "Snake: 5 Punkte",
+    snake20: "Snake: 20 Punkte",
+    snakeHS: "Snake: Highscore geknackt"
+  };
+
+  // ------------------------------
+  // Default state + persistence
+  // ------------------------------
+  function defaultState(){
+    return {
+      meta:{
+        title: DEFAULT_APP_TITLE,
+        name: "Reto",
+        giftMode: true
+      },
+      progress:{
+        level:1, xp:0, coins:0, streak:0, lastDay:null
+      },
+      quests:[],
+      customQuests:[],
+      stats:{done:0,boss:0},
+      ach:{},
+      log:[],
+      ui:{tab:"quests"},
+      gift:{
+        message:"",
+        story:"",
+        introSeen:false
+      },
+      game:{
+        snakeHighScore:0
+      }
+    };
+  }
+
+  function normalizeState(s){
+    const d = defaultState();
+    if(!s || typeof s!=="object") s = d;
+
+    s.meta = s.meta || {...d.meta};
+    s.meta.title = String(s.meta.title || d.meta.title);
+    s.meta.name = String(s.meta.name || d.meta.name);
+    if(typeof s.meta.giftMode!=="boolean") s.meta.giftMode = d.meta.giftMode;
+
+    s.progress = s.progress || {...d.progress};
+    s.progress.level = toInt(s.progress.level,1);
+    s.progress.xp = toInt(s.progress.xp,0);
+    s.progress.coins = toInt(s.progress.coins,0);
+    s.progress.streak = toInt(s.progress.streak,0);
+    s.progress.lastDay = s.progress.lastDay ? String(s.progress.lastDay) : null;
+
+    s.quests = Array.isArray(s.quests)?s.quests:[];
+    s.customQuests = Array.isArray(s.customQuests)?s.customQuests:[];
+    s.stats = s.stats || {...d.stats};
+    s.stats.done = toInt(s.stats.done,0);
+    s.stats.boss = toInt(s.stats.boss,0);
+    s.ach = s.ach || {};
+    s.log = Array.isArray(s.log)?s.log:[];
+    s.ui = s.ui || {tab:"quests"};
+    s.ui.tab = String(s.ui.tab || "quests");
+
+    s.gift = s.gift || {...d.gift};
+    s.gift.message = String(s.gift.message || "");
+    s.gift.story = String(s.gift.story || "");
+    if(typeof s.gift.introSeen!=="boolean") s.gift.introSeen = false;
+
+    s.game = s.game || {...d.game};
+    s.game.snakeHighScore = toInt(s.game.snakeHighScore,0);
+
+    return s;
+  }
+
+  function load(){
+    try{
+      const raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      return normalizeState(raw || defaultState());
+    } catch {
+      return normalizeState(defaultState());
+    }
+  }
+  function save(s){ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+
+  // ------------------------------
+  // Game logic: xp/coins/level/streak
+  // ------------------------------
+  function updateStreak(s){
+    const t=todayISO();
+    const p = s.progress;
+    if(!p.lastDay){ p.streak=1; p.lastDay=t; return; }
+    if(p.lastDay===t) return;
+    p.streak = (p.lastDay===yesterdayISO()) ? (p.streak+1) : 1;
+    p.lastDay=t;
+  }
+
+  function unlock(s,id){
+    if(s.ach[id]) return;
+    s.ach[id]=true;
+    alert("Achievement freigeschaltet: " + (ACH[id]||id));
+  }
+
+  function checkAchievements(s){
+    if(s.stats.done>=1) unlock(s,"firstQuest");
+    if(s.stats.done>=10) unlock(s,"quest10");
+    if(s.stats.boss>=1) unlock(s,"boss1");
+    if(s.progress.streak>=3) unlock(s,"streak3");
+    if(s.progress.level>=5) unlock(s,"lvl5");
+    if(s.game.snakeHighScore>=5) unlock(s,"snake5");
+    if(s.game.snakeHighScore>=20) unlock(s,"snake20");
+  }
+
+  function gainRewards(s, xpGain, coinGain, note){
+    updateStreak(s);
+    const p = s.progress;
+    p.xp += xpGain;
+    p.coins += coinGain;
+
+    while(p.xp >= xpForNext(p.level)){
+      p.xp -= xpForNext(p.level);
+      p.level += 1;
+      s.log.unshift(`${todayISO()} — Levelaufstieg → ${p.level}`);
+    }
+    s.log.unshift(`${todayISO()} — +${xpGain} XP, +${coinGain} Coins — ${note}`);
+    checkAchievements(s);
+  }
+
+  // ------------------------------
+  // Quests (clean + grammar)
+  // ------------------------------
+  const DAILY_POOL = [
+    {title:"Aufwärm-Quest", desc:"10 Minuten Mobility/Dehnen.", xp:25, coins:5, tag:"Fitness"},
+    {title:"Nebenquest: Schritte", desc:"20 Minuten spazieren gehen.", xp:30, coins:5, tag:"Fitness"},
+    {title:"Fokus-Sprint", desc:"15 Minuten konzentriert arbeiten (ohne Handy).", xp:35, coins:8, tag:"Fokus"},
+    {title:"Inventar aufräumen", desc:"5 Minuten Schreibtisch aufräumen.", xp:18, coins:4, tag:"Ordnung"},
+    {title:"Mini-Quest: Lesen", desc:"10 Minuten lesen.", xp:22, coins:5, tag:"Mindset"},
+  ];
+
+  const WEEKLY_POOL = [
+    {title:"Dungeon-Run", desc:"3 Trainings diese Woche.", xp:120, coins:30, tag:"Fitness"},
+    {title:"Boss-Route", desc:"1 Fokusblock à 60 Minuten.", xp:100, coins:25, tag:"Fokus"},
+    {title:"Co-op-Quest", desc:"Etwas mit jemandem planen und durchziehen.", xp:70, coins:20, tag:"Sozial"},
+  ];
+
+  const BOSS_POOL = [
+    {title:"Boss-Quest: Schwierige Sache", desc:"Eine Aufgabe, die du sonst aufschiebst, anpacken.", xp:160, coins:40, tag:"Boss", boss:true},
+  ];
+
+  function pickUnique(pool, n){
+    const copy=[...pool];
+    const out=[];
+    while(out.length<n && copy.length){
+      out.push(copy.splice(Math.floor(Math.random()*copy.length),1)[0]);
+    }
+    return out;
+  }
+
+  function combinedPool(s, type){
+    const builtIn =
+      type==="daily" ? DAILY_POOL :
+      type==="weekly" ? WEEKLY_POOL :
+      type==="boss" ? BOSS_POOL : [];
+    const custom = (s.customQuests||[]).filter(q=>q.type===type && q.enabled!==false);
+    return [...builtIn, ...custom];
+  }
+
+  function makeDailies(s){
+    const pool = combinedPool(s,"daily");
+    const base = pickUnique(pool, 4).map((q,i)=>({
+      id: crypto.randomUUID?.() || String(Date.now()+i),
+      ...q,
+      done:false
+    }));
+    // kleine Boss-Chance
+    if(Math.random()<0.25){
+      const boss = pickUnique(combinedPool(s,"boss"), 1).map((q,i)=>({
+        id: crypto.randomUUID?.() || String(Date.now()+100+i),
+        ...q,
+        done:false
+      }));
+      s.quests = [...base, ...boss];
+    } else {
+      s.quests = base;
+    }
+  }
+
+  function makeWeeklies(s){
+    const pool = combinedPool(s,"weekly");
+    s.quests = pickUnique(pool, 4).map((q,i)=>({
+      id: crypto.randomUUID?.() || String(Date.now()+i),
+      ...q,
+      done:false,
+      weekly:true
+    }));
+  }
+
+  // ------------------------------
+  // Custom quests (CRUD)
+  // ------------------------------
+  let editingCustomId = null;
+
+  function clearCustomForm(){
+    editingCustomId = null;
+    el("cqTitle").value="";
+    el("cqDesc").value="";
+    el("cqTag").value="";
+    el("cqType").value="daily";
+    el("cqXP").value="30";
+    el("cqCoins").value="5";
+    el("cqCancel").classList.add("hidden");
+    el("cqAdd").textContent="＋ Hinzufügen";
+  }
+
+  function upsertCustomQuest(){
+    const s=load();
+    const title = (el("cqTitle").value||"").trim();
+    if(!title){ alert("Bitte gib mindestens einen Titel an."); return; }
+
+    const type = el("cqType").value;
+    const q = {
+      id: editingCustomId || (crypto.randomUUID?.() || String(Date.now())),
+      title,
+      desc: (el("cqDesc").value||"").trim(),
+      tag: (el("cqTag").value||"Ohne Tag").trim(),
+      type,
+      xp: Math.max(0,toInt(el("cqXP").value,0)),
+      coins: Math.max(0,toInt(el("cqCoins").value,0)),
+      boss: type==="boss",
+      enabled:true
+    };
+
+    const list = s.customQuests || [];
+    const idx = list.findIndex(x=>x.id===q.id);
+    if(idx>=0) list[idx] = {...list[idx], ...q};
+    else list.unshift(q);
+
+    s.customQuests = list;
+    save(s);
+    clearCustomForm();
+    render();
+  }
+
+  // ------------------------------
+  // UI: tabs
+  // ------------------------------
+  function setTab(tab, silent=false){
+    const all = ["quests","story","snake","settings"];
+    all.forEach(t=>{
+      const btn = $(`.tabs button[data-tab="${t}"]`);
+      const panel = el(`tab-${t}`);
+      if(btn) btn.classList.toggle("active", t===tab);
+      if(panel) panel.classList.toggle("hidden", t!==tab);
+    });
+    if(!silent){
+      const s=load(); s.ui.tab = tab; save(s);
+    }
+  }
+
+  // ------------------------------
+  // Gift modal
+  // ------------------------------
+  function openGiftModal(s){
+    const title = s.meta.title || DEFAULT_APP_TITLE;
+    const name = (s.meta.name||"").trim();
+    el("giftModalAppName").textContent = title;
+    el("giftModalTitle").textContent = name ? `🎄 Frohe Weihnachten, ${name}!` : "🎄 Frohe Weihnachten!";
+
+    const msg = (s.gift.message||"").trim() || defaultGiftMessage(name||"Reto");
+    const story = (s.gift.story||"").trim() || defaultStory(name||"Reto");
+
+    el("giftModalText").textContent = msg;
+    el("giftModalStory").textContent = story;
+
+    el("giftModalBack").classList.remove("hidden");
+  }
+  function closeGiftModal(){ el("giftModalBack").classList.add("hidden"); }
+
+  // ------------------------------
+  // Render
+  // ------------------------------
+  function renderHeader(s){
+    const title = (s.meta.title||DEFAULT_APP_TITLE).trim() || DEFAULT_APP_TITLE;
+    const name = (s.meta.name||"").trim();
+    el("appTitle").textContent = name ? `${title} — ${name}` : title;
+    el("appSubtitle").textContent = "Dein Lebens-Game: Quests abschließen, XP sammeln, leveln. Alles bleibt lokal auf deinem Gerät.";
+    document.title = title;
+  }
+
+  function renderQuests(s){
+    const root = el("questList");
+    root.innerHTML="";
+
+    if((s.quests||[]).length===0){
+      const msg=document.createElement("div");
+      msg.className="muted";
+      msg.textContent='Noch keine Quests. Klick „Daily Quests“.';
+      root.appendChild(msg);
+      return;
+    }
+
+    s.quests.forEach(q=>{
+      const div=document.createElement("div");
+      div.className="q";
+
+      const left=document.createElement("div");
+      const titleRow=document.createElement("div");
+
+      const t=document.createElement("span");
+      t.className="qtitle";
+      t.textContent=q.title;
+
+      const pills=document.createElement("span");
+      const pTag=document.createElement("span");
+      pTag.className="pill";
+      pTag.textContent=q.tag || "Ohne Tag";
+      pills.appendChild(pTag);
+
+      if(q.weekly){ const p=document.createElement("span"); p.className="pill"; p.textContent="Weekly"; pills.appendChild(p); }
+      if(q.boss){ const p=document.createElement("span"); p.className="pill"; p.textContent="Boss"; pills.appendChild(p); }
+
+      titleRow.append(t, document.createTextNode(" "), pills);
+
+      const desc=document.createElement("div");
+      desc.className="qdesc";
+      desc.textContent=q.desc || "";
+
+      const meta=document.createElement("div");
+      meta.className="qmeta";
+      meta.textContent=`Belohnung: +${q.xp} XP, +${q.coins} Coins`;
+
+      left.appendChild(titleRow);
+      if(q.desc) left.appendChild(desc);
+      left.appendChild(meta);
+
+      const right=document.createElement("div");
+      const btn=document.createElement("button");
+      btn.dataset.id=q.id;
+      btn.disabled=!!q.done;
+      btn.textContent = q.done ? "✅ Erledigt" : "Abschließen";
+      right.appendChild(btn);
+
+      div.append(left, right);
+      root.appendChild(div);
+
+      btn.addEventListener("click", ()=>{
+        const s2=load();
+        const quest = s2.quests.find(x=>x.id===q.id);
+        if(!quest || quest.done) return;
+
+        quest.done=true;
+        s2.stats.done += 1;
+        if(quest.boss) s2.stats.boss += 1;
+
+        gainRewards(s2, quest.xp, quest.coins, `Quest abgeschlossen: ${quest.title}`);
+        save(s2);
+        render();
+      });
+    });
+  }
+
+  function renderCustomQuests(s){
+    const root = el("customQuestList");
+    root.innerHTML="";
+
+    const list = (s.customQuests||[]);
+    if(list.length===0){
+      const msg=document.createElement("div");
+      msg.className="muted";
+      msg.textContent="Noch keine eigenen Quests. Erstelle oben deine erste.";
+      root.appendChild(msg);
+      return;
+    }
+
+    list.forEach(q=>{
+      const div=document.createElement("div");
+      div.className="q";
+
+      const left=document.createElement("div");
+      const titleRow=document.createElement("div");
+
+      const t=document.createElement("span");
+      t.className="qtitle";
+      t.textContent=q.title;
+
+      const pills=document.createElement("span");
+      const p1=document.createElement("span"); p1.className="pill"; p1.textContent=q.tag||"Ohne Tag";
+      const p2=document.createElement("span"); p2.className="pill"; p2.textContent=q.type==="daily"?"Daily":q.type==="weekly"?"Weekly":"Boss";
+      pills.append(p1,p2);
+      if(q.enabled===false){ const p=document.createElement("span"); p.className="pill"; p.textContent="Deaktiviert"; pills.appendChild(p); }
+
+      titleRow.append(t, document.createTextNode(" "), pills);
+
+      const meta=document.createElement("div");
+      meta.className="qmeta";
+      meta.textContent=`+${q.xp} XP, +${q.coins} Coins`;
+
+      left.appendChild(titleRow);
+      if(q.desc){
+        const d=document.createElement("div");
+        d.className="qdesc";
+        d.textContent=q.desc;
+        left.appendChild(d);
+      }
+      left.appendChild(meta);
+
+      const right=document.createElement("div");
+      right.className="row";
+
+      const edit=document.createElement("button");
+      edit.textContent="Bearbeiten";
+      edit.addEventListener("click", ()=>{
+        editingCustomId = q.id;
+        el("cqTitle").value=q.title||"";
+        el("cqDesc").value=q.desc||"";
+        el("cqTag").value=q.tag||"";
+        el("cqType").value=q.type||"daily";
+        el("cqXP").value=String(q.xp??0);
+        el("cqCoins").value=String(q.coins??0);
+        el("cqCancel").classList.remove("hidden");
+        el("cqAdd").textContent="💾 Speichern";
+        setTab("quests");
+        window.scrollTo({top:0, behavior:"smooth"});
+      });
+
+      const toggle=document.createElement("button");
+      toggle.textContent = (q.enabled===false) ? "Aktivieren" : "Deaktivieren";
+      toggle.addEventListener("click", ()=>{
+        const s2=load();
+        const item = (s2.customQuests||[]).find(x=>x.id===q.id);
+        if(!item) return;
+        item.enabled = (item.enabled===false) ? true : false;
+        save(s2);
+        render();
+      });
+
+      const del=document.createElement("button");
+      del.className="danger";
+      del.textContent="Löschen";
+      del.addEventListener("click", ()=>{
+        if(!confirm("Diese eigene Quest wirklich löschen?")) return;
+        const s2=load();
+        s2.customQuests = (s2.customQuests||[]).filter(x=>x.id!==q.id);
+        save(s2);
+        if(editingCustomId===q.id) clearCustomForm();
+        render();
+      });
+
+      right.append(edit,toggle,del);
+      div.append(left,right);
+      root.appendChild(div);
+    });
+  }
+
+  function renderAchievements(s){
+    el("ach").innerHTML = Object.keys(ACH).map(id=>{
+      const got = !!s.ach[id];
+      return `<span class="pill" title="${got?'Freigeschaltet':'Gesperrt'}">${got?'✅':'🔒'} ${ACH[id]}</span>`;
+    }).join("");
+  }
+
+  function renderStats(s){
+    el("level").textContent=String(s.progress.level);
+    el("xp").textContent=String(s.progress.xp);
+    el("xpNext").textContent=String(xpForNext(s.progress.level));
+    el("coins").textContent=String(s.progress.coins);
+    el("streak").textContent=String(s.progress.streak);
+  }
+
+  function renderLog(s){
+    const logEl = el("log");
+    logEl.innerHTML="";
+    (s.log||[]).slice(0,12).forEach(line=>{
+      const li=document.createElement("li");
+      li.textContent=line;
+      logEl.appendChild(li);
+    });
+  }
+
+  function renderGiftEditors(s){
+    const name = (s.meta.name||"Reto").trim() || "Reto";
+    el("giftMsg").value = (s.gift.message||"").trim() || defaultGiftMessage(name);
+    el("giftStory").value = (s.gift.story||"").trim() || defaultStory(name);
+  }
+
+  function renderSettings(s){
+    el("setTitle").value = s.meta.title || DEFAULT_APP_TITLE;
+    el("setName").value = s.meta.name || "";
+    el("setGiftMode").checked = !!s.meta.giftMode;
+  }
+
+  function renderSnakeHeader(s){
+    el("snakeHighPill").textContent = `Highscore: ${s.game.snakeHighScore||0}`;
+  }
+
+  function render(){
+    const s=load();
+    renderHeader(s);
+    setTab(s.ui.tab || "quests", true);
+
+    // Gift defaults (only set if empty)
+    if(!s.gift.message) s.gift.message = defaultGiftMessage(s.meta.name||"Reto");
+    if(!s.gift.story) s.gift.story = defaultStory(s.meta.name||"Reto");
+
+    // show intro if giftMode and not seen
+    if(s.meta.giftMode && !s.gift.introSeen){
+      save(s);
+      openGiftModal(s);
+    }
+
+    renderStats(s);
+    renderQuests(s);
+    renderCustomQuests(s);
+    renderAchievements(s);
+    renderLog(s);
+    renderGiftEditors(s);
+    renderSettings(s);
+    renderSnakeHeader(s);
+
+    // keep snake score pill in sync
+    el("snakeScorePill").textContent = `Score: ${snake.score}`;
+  }
+
+  // ------------------------------
+  // Buttons / actions
+  // ------------------------------
+  $$("#tabs button[data-tab]").forEach(b=>{
+    b.addEventListener("click", ()=> setTab(b.getAttribute("data-tab")));
+  });
+
+  el("newDaily").addEventListener("click", ()=>{ const s=load(); makeDailies(s); save(s); render(); });
+  el("newWeekly").addEventListener("click", ()=>{ const s=load(); makeWeeklies(s); save(s); render(); });
+
+  el("reset").addEventListener("click", ()=>{
+    if(confirm("Wirklich alles löschen?")){
+      localStorage.removeItem(STORAGE_KEY);
+      render();
+    }
+  });
+
+  el("cqAdd").addEventListener("click", upsertCustomQuest);
+  el("cqCancel").addEventListener("click", clearCustomForm);
+
+  // Export/Import: custom quests only
+  el("exportBtn").addEventListener("click", async ()=>{
+    const s=load();
+    const payload = JSON.stringify({version:1, customQuests:s.customQuests||[]}, null, 2);
+    try{
+      await navigator.clipboard.writeText(payload);
+      alert("Export kopiert (JSON).");
+    } catch {
+      prompt("Kopiere den Export-JSON:", payload);
+    }
+  });
+
+  el("importBtn").addEventListener("click", ()=>{
+    const txt = prompt("Füge hier den Export-JSON (Custom Quests) ein:");
+    if(!txt) return;
+    try{
+      const data = JSON.parse(txt);
+      const list = Array.isArray(data?.customQuests) ? data.customQuests : null;
+      if(!list) throw new Error("Ungültiges Format");
+      const s=load();
+      s.customQuests = list.map(q=>({
+        id: q.id || (crypto.randomUUID?.() || String(Date.now()+Math.random())),
+        title: String(q.title||"").trim(),
+        desc: String(q.desc||"").trim(),
+        tag: String(q.tag||"Ohne Tag").trim(),
+        type: (q.type==="weekly"||q.type==="boss") ? q.type : "daily",
+        xp: Math.max(0,toInt(q.xp,0)),
+        coins: Math.max(0,toInt(q.coins,0)),
+        boss: (q.type==="boss") ? true : !!q.boss,
+        enabled: q.enabled!==false
+      })).filter(q=>q.title);
+      save(s);
+      clearCustomForm();
+      render();
+      alert("Import erfolgreich.");
+    } catch(e){
+      alert("Import fehlgeschlagen: " + (e?.message||"Unbekannter Fehler"));
+    }
+  });
+
+  // Full export/import (device migration)
+  el("exportAll").addEventListener("click", async ()=>{
+    const s=load();
+    const payload = JSON.stringify({version:3, state:s}, null, 2);
+    try{
+      await navigator.clipboard.writeText(payload);
+      alert("Komplett-Export kopiert (JSON).");
+    } catch {
+      prompt("Kopiere den Komplett-Export:", payload);
+    }
+  });
+
+  el("importAll").addEventListener("click", ()=>{
+    const txt = prompt("Füge hier den Komplett-Export (JSON) ein:");
+    if(!txt) return;
+    try{
+      const data = JSON.parse(txt);
+      if(!data?.state) throw new Error("Ungültiges Format");
+      const s = normalizeState(data.state);
+      save(s);
+      render();
+      alert("Import erfolgreich.");
+    } catch(e){
+      alert("Import fehlgeschlagen: " + (e?.message||"Unbekannter Fehler"));
+    }
+  });
+
+  // Gift modal controls
+  el("giftClose").addEventListener("click", closeGiftModal);
+  el("giftModalBack").addEventListener("click", (e)=>{ if(e.target===el("giftModalBack")) closeGiftModal(); });
+
+  el("giftStart").addEventListener("click", ()=>{
+    const s=load();
+    s.gift.introSeen = true;
+    save(s);
+    closeGiftModal();
+    render();
+  });
+
+  el("giftEdit").addEventListener("click", ()=>{
+    closeGiftModal();
+    setTab("story");
+  });
+
+  el("storyShow").addEventListener("click", ()=> openGiftModal(load()));
+
+  el("giftMsgSave").addEventListener("click", ()=>{
+    const s=load();
+    s.gift.message = (el("giftMsg").value||"").trim();
+    save(s);
+    alert("Intro-Text gespeichert.");
+    render();
+  });
+
+  el("giftMsgReset").addEventListener("click", ()=>{
+    const s=load();
+    s.gift.message = defaultGiftMessage(s.meta.name||"Reto");
+    save(s);
+    render();
+  });
+
+  el("storySave").addEventListener("click", ()=>{
+    const s=load();
+    s.gift.story = (el("giftStory").value||"").trim();
+    save(s);
+    alert("Story gespeichert.");
+    render();
+  });
+
+  el("storyReset").addEventListener("click", ()=>{
+    const s=load();
+    s.gift.story = defaultStory(s.meta.name||"Reto");
+    save(s);
+    render();
+  });
+
+  // Settings save
+  el("settingsSave").addEventListener("click", ()=>{
+    const s=load();
+    s.meta.title = (el("setTitle").value||DEFAULT_APP_TITLE).trim() || DEFAULT_APP_TITLE;
+    s.meta.name = (el("setName").value||"").trim() || "Reto";
+    s.meta.giftMode = !!el("setGiftMode").checked;
+
+    // keep defaults aligned
+    if(!s.gift.message) s.gift.message = defaultGiftMessage(s.meta.name);
+    if(!s.gift.story) s.gift.story = defaultStory(s.meta.name);
+
+    save(s);
+    alert("Einstellungen gespeichert.");
+    render();
+  });
+
+  el("openIntro").addEventListener("click", ()=> openGiftModal(load()));
+
+  // ------------------------------
+  // Snake (mobile-friendly + touch)
+  // ------------------------------
+  const snake = {
+    grid: 20,
+    cell: 16,
+    dir: {x:1,y:0},
+    nextDir: {x:1,y:0},
+    body: [{x:10,y:10},{x:9,y:10},{x:8,y:10}],
+    food: {x:14,y:10},
+    score: 0,
+    running: false,
+    paused: false,
+    loop: null,
+    speed: 10
+  };
+
+  function randFood(){
+    const occ = new Set(snake.body.map(p=>`${p.x},${p.y}`));
+    let x,y;
+    do{
+      x = Math.floor(Math.random()*snake.grid);
+      y = Math.floor(Math.random()*snake.grid);
+    } while(occ.has(`${x},${y}`));
+    snake.food = {x,y};
+  }
+
+  function resetSnake(){
+    snake.dir = {x:1,y:0};
+    snake.nextDir = {x:1,y:0};
+    snake.body = [{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+    snake.score = 0;
+    randFood();
+    snake.paused = false;
+    drawSnake();
+    el("snakeScorePill").textContent = `Score: ${snake.score}`;
+    el("snakeMsg").textContent = "";
+  }
+
+  function setSnakeSpeed(){
+    snake.speed = toInt(el("snakeSpeed").value, 10);
+    if(snake.running){
+      stopSnakeLoop();
+      startSnakeLoop();
+    }
+  }
+
+  function startSnakeLoop(){
+    const interval = Math.max(30, Math.floor(1000 / snake.speed));
+    snake.loop = setInterval(stepSnake, interval);
+  }
+  function stopSnakeLoop(){
+    if(snake.loop){ clearInterval(snake.loop); snake.loop=null; }
+  }
+
+  function startSnake(){
+    if(snake.running) return;
+    snake.running = true;
+    snake.paused = false;
+    setSnakeSpeed();
+    startSnakeLoop();
+    el("snakeMsg").textContent = "Viel Erfolg! 🐍";
+  }
+  function pauseSnake(){
+    if(!snake.running) return;
+    snake.paused = !snake.paused;
+    el("snakeMsg").textContent = snake.paused ? "Pause." : "Weiter!";
+  }
+
+  function gameOver(){
+    stopSnakeLoop();
+    snake.running=false;
+    snake.paused=false;
+    const score = snake.score;
+    el("snakeMsg").textContent = `Game Over. Score: ${score}`;
+
+    const s = load();
+    const prevHS = s.game.snakeHighScore||0;
+    if(score > prevHS){
+      s.game.snakeHighScore = score;
+      gainRewards(s, 60, 20, `Snake: Neuer Highscore (${score})`);
+      unlock(s,"snakeHS");
+    }
+    save(s);
+    render();
+  }
+
+  function stepSnake(){
+    if(!snake.running || snake.paused) return;
+
+    const nd = snake.nextDir;
+    if(!(nd.x === -snake.dir.x && nd.y === -snake.dir.y)){
+      snake.dir = {...nd};
+    }
+
+    const head = snake.body[0];
+    const nh = {x: head.x + snake.dir.x, y: head.y + snake.dir.y};
+
+    if(nh.x<0 || nh.y<0 || nh.x>=snake.grid || nh.y>=snake.grid) return gameOver();
+    if(snake.body.some(p=>p.x===nh.x && p.y===nh.y)) return gameOver();
+
+    snake.body.unshift(nh);
+
+    if(nh.x===snake.food.x && nh.y===snake.food.y){
+      snake.score += 1;
+      randFood();
+    } else {
+      snake.body.pop();
+    }
+
+    el("snakeScorePill").textContent = `Score: ${snake.score}`;
+    drawSnake();
+  }
+
+  function drawSnake(){
+    const canvas = el("snakeCanvas");
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.strokeStyle = "rgba(0,0,0,.06)";
+    for(let i=0;i<=snake.grid;i++){
+      ctx.beginPath(); ctx.moveTo(i*snake.cell,0); ctx.lineTo(i*snake.cell,canvas.height); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,i*snake.cell); ctx.lineTo(canvas.width,i*snake.cell); ctx.stroke();
+    }
+
+    ctx.fillStyle = "#111";
+    ctx.fillRect(snake.food.x*snake.cell, snake.food.y*snake.cell, snake.cell, snake.cell);
+
+    ctx.fillStyle = "rgba(0,0,0,.85)";
+    snake.body.forEach((p, idx)=>{
+      const pad = idx===0 ? 1 : 2;
+      ctx.fillRect(p.x*snake.cell+pad, p.y*snake.cell+pad, snake.cell-2*pad, snake.cell-2*pad);
+    });
+  }
+
+  function setSnakeDir(dir){
+    const map = {
+      up:{x:0,y:-1},
+      down:{x:0,y:1},
+      left:{x:-1,y:0},
+      right:{x:1,y:0},
+    };
+    if(map[dir]) snake.nextDir = map[dir];
+  }
+
+  // keyboard controls
+  window.addEventListener("keydown",(e)=>{
+    if(load().ui.tab !== "snake") return;
+    const k = e.key.toLowerCase();
+    if(k==="arrowup"||k==="w") setSnakeDir("up");
+    if(k==="arrowdown"||k==="s") setSnakeDir("down");
+    if(k==="arrowleft"||k==="a") setSnakeDir("left");
+    if(k==="arrowright"||k==="d") setSnakeDir("right");
+    if(["arrowup","arrowdown","arrowleft","arrowright","w","a","s","d"].includes(k)) e.preventDefault();
+  });
+
+  // touch D-pad (pointer)
+  $$(".dpad button[data-dir]").forEach(btn=>{
+    const dir = btn.getAttribute("data-dir");
+    const handler = (e)=>{ e.preventDefault(); setSnakeDir(dir); };
+    btn.addEventListener("pointerdown", handler, {passive:false});
+  });
+
+  el("snakeStart").addEventListener("click", startSnake);
+  el("snakePause").addEventListener("click", pauseSnake);
+  el("snakeReset").addEventListener("click", ()=>{ stopSnakeLoop(); snake.running=false; resetSnake(); });
+  el("snakeSpeed").addEventListener("change", setSnakeSpeed);
+
+  // ------------------------------
+  // PWA / Service worker
+  // ------------------------------
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", ()=>{
+      navigator.serviceWorker.register("./sw.js").catch(()=>{});
+    });
+  }
+
+  // ------------------------------
+  // Init
+  // ------------------------------
+  resetSnake();
+  render();
+</script>
+</body>
+</html>
