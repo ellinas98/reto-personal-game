@@ -2,536 +2,671 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#081a3a" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Reto's personal Game</title>
   <link rel="manifest" href="./manifest.webmanifest" />
   <style>
-    :root{
-      --bg:#081a3a;         /* dunkelblau */
-      --fg:#f2f6ff;
-      --card:#0f2552;
-      --border:#1c3a7a;
-      --accent:#ffd54a;
-      --accent2:#7ee081;
-      --shadow:rgba(0,0,0,.35);
-    }
-
-    *{box-sizing:border-box}
+    /* Layout */
     body{
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      margin:0;
-      background:var(--bg);
-      color:var(--fg);
-    }
-
-    .container{
+      font-family:system-ui,Arial;
       max-width:980px;
-      margin:0 auto;
-      padding:18px 14px 28px;
+      margin:22px auto;
+      padding:0 14px;
+      background:#081a3a;
+      color:#f4f7ff
     }
-
-    h1{margin:10px 0 6px;font-size:24px}
     .muted{opacity:.78}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .split{justify-content:space-between}
     .grow{flex:1;min-width:220px}
 
     .card{
-      border:1px solid var(--border);
+      border:1px solid rgba(255,255,255,.10);
       border-radius:14px;
       padding:14px;
       margin:12px 0;
-      background:var(--card);
-      box-shadow:0 10px 26px var(--shadow);
+      background:rgba(255,255,255,.06);
+      box-shadow:0 10px 26px rgba(0,0,0,.25);
+      backdrop-filter: blur(6px);
     }
-
     .stat{
-      border:1px dashed rgba(255,255,255,.25);
+      border:1px dashed rgba(255,255,255,.18);
       border-radius:12px;
       padding:10px 12px;
       min-width:160px
     }
-
-    button,input,select,textarea{
-      padding:10px;
-      font-size:14px;
-      color:var(--fg);
-    }
-    input,select,textarea{
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.18);
-      border-radius:10px;
-      width:100%;
-    }
-    textarea{min-height:110px;resize:vertical}
-    button{
-      cursor:pointer;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.22);
-      border-radius:10px
-    }
-    .danger{border-color:#ff6b6b;color:#ff6b6b}
-    .btn-accent{border:2px solid var(--accent)}
     .pill{
       display:inline-block;
-      border:1px solid rgba(255,255,255,.20);
+      border:1px solid rgba(255,255,255,.16);
       border-radius:999px;
       padding:4px 10px;
       margin:4px 6px 0 0;
-      font-size:13px
+      font-size:13px;
+      background:rgba(0,0,0,.10)
+    }
+    .q{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:12px;
+      padding:10px;
+      margin:8px 0;
+      background:rgba(0,0,0,.10)
+    }
+    .q small{opacity:.75}
+    .danger{border-color:#ff4b4b;color:#ffb8b8}
+    button,input,select,textarea{padding:10px;font-size:14px}
+    textarea{min-height:80px;resize:vertical;width:100%}
+    button{cursor:pointer}
+    .dial{
+      width:84px;height:84px;border-radius:50%;
+      border:2px solid rgba(255,255,255,.35);
+      display:grid;place-items:center
+    }
+    .dial span{font-weight:700}
+
+    .q .qtitle{font-weight:700}
+    .q .qmeta{opacity:.8;font-size:13px;margin-top:4px}
+    .q .qdesc{opacity:.8;margin-top:2px}
+    .hidden{display:none !important}
+
+    /* --- Theme variables --- */
+    :root{
+      --bg:#081a3a;
+      --fg:#f4f7ff;
+      --card:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.12);
+      --accent:#dbe7ff;
+      --accent2:#62d28e;
+      --shadow:rgba(0,0,0,.25);
+    }
+
+    body{background:var(--bg);color:var(--fg)}
+    body.retro{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+
+    /* Optional: Xmas accents (background bleibt dunkelblau) */
+    body.xmas{--accent:#ffccd6;--accent2:#62d28e}
+    body.classic{--accent:#dbe7ff;--accent2:#a6c8ff}
+
+    /* Pixel UI */
+    body.pixel button,
+    body.pixel input,
+    body.pixel select{
+      border:2px solid rgba(255,255,255,.35);
+      background:rgba(0,0,0,.10);
+      color:var(--fg);
+      border-radius:10px;
+      box-shadow: 0 4px 0 rgba(0,0,0,.35);
+      transform: translateY(0);
+    }
+    body.pixel textarea{
+      border:2px solid rgba(255,255,255,.25);
+      background:rgba(0,0,0,.10);
+      color:var(--fg);
+      border-radius:12px;
+    }
+    body.pixel button:active{
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 rgba(0,0,0,.35);
+    }
+    body.pixel .card{
+      border-width:2px;
+      border-radius:16px;
+      box-shadow: 0 10px 0 rgba(0,0,0,.10);
+    }
+    body.pixel .pill{
+      border-width:2px;
+      border-radius:999px;
+      box-shadow: 0 3px 0 rgba(0,0,0,.18);
+    }
+    .btn-accent{
+      border:2px solid var(--accent2) !important;
+      box-shadow: 0 4px 0 rgba(0,0,0,.35) !important;
     }
     .kbd{
-      border:1px solid rgba(255,255,255,.22);
+      border:1px solid rgba(255,255,255,.18);
       border-bottom-width:3px;
       border-radius:8px;
       padding:2px 8px;
       font-size:12px;
-      opacity:.95;
-      user-select:none;
+      opacity:.92;
+      background:rgba(0,0,0,.12)
     }
 
+    /* Tabs */
     .tabs{display:flex;gap:10px;flex-wrap:wrap}
-    .tabs button.active{background:var(--accent);color:#0b1330;border-color:var(--accent)}
-
-    .q{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      justify-content:space-between;
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:12px;
-      padding:10px;
-      margin:8px 0;
-    }
-    .qtitle{font-weight:700}
-    .qmeta{opacity:.8;font-size:13px;margin-top:4px}
-    .qdesc{opacity:.85;margin-top:2px;line-height:1.35}
-    .hidden{display:none !important}
+    .tabs button{padding:10px 12px}
+    .tabs button.active{background:rgba(255,255,255,.16);color:var(--fg)}
 
     /* Modal */
     .modalBack{
-      position:fixed;inset:0;
-      background:rgba(0,0,0,.55);
-      display:flex;align-items:center;justify-content:center;
-      z-index:9999;
-      padding:16px;
+      position:fixed;inset:0;background:rgba(0,0,0,.65);
+      display:flex;align-items:center;justify-content:center;z-index:9999
     }
     .modal{
-      width:min(760px,96vw);
-      background:var(--card);
-      border:1px solid var(--border);
+      width:min(760px,92vw);
+      background:rgba(8,26,58,.96);
+      border:1px solid rgba(255,255,255,.14);
       border-radius:16px;
       padding:16px 16px 14px;
-      box-shadow:0 16px 40px rgba(0,0,0,.45);
+      box-shadow:0 20px 60px rgba(0,0,0,.45)
     }
     .titleRow{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .spark{color:var(--accent2);font-weight:800}
     pre.storyBox{
       white-space:pre-wrap;
-      border:1px solid rgba(255,255,255,.18);
+      border:2px solid rgba(255,255,255,.16);
       border-radius:12px;
       padding:12px;
-      background:rgba(255,255,255,.04);
+      background:rgba(0,0,0,.18);
       line-height:1.5;
       margin:10px 0 0 0;
     }
 
-    /* Snake */
+    /* =========================
+       SNAKE: größer + mobile
+       ========================= */
     #snakeCanvas{
-      border:2px solid var(--accent);
+      border:2px solid rgba(255,255,255,.35);
       border-radius:10px;
       image-rendering:pixelated;
+
+      width: min(96vw, 520px);
+      height: auto;
+      max-width: 520px;
+
+      touch-action: none; /* wichtig für Swipe */
       background:#fff;
-      width:min(320px, 92vw);
-      height:auto;
-      touch-action:none;
     }
+    .snakeHUD{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 
-    .hud{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-
-    /* Mobile controls */
+    /* Mobile D-Pad */
     .dpad{
       display:grid;
-      grid-template-columns: 56px 56px 56px;
-      grid-template-rows: 56px 56px 56px;
-      gap:10px;
-      place-items:center;
-      margin-top:10px;
-      user-select:none;
+      grid-template-columns: 52px 52px 52px;
+      grid-template-rows: 52px 52px 52px;
+      gap:8px;
+      justify-content:start;
+      align-items:center;
+      margin-top:12px;
     }
     .dpad button{
-      width:56px;height:56px;
-      border:2px solid var(--accent);
-      border-radius:14px;
+      width:52px;height:52px;
+      display:grid;place-items:center;
       font-size:18px;
-      line-height:1;
-      touch-action:manipulation;
     }
     .dpad .empty{visibility:hidden}
 
-    /* Compact stats on small screens */
-    @media (max-width:520px){
-      .stat{min-width:calc(50% - 10px)}
-      h1{font-size:22px}
+    /* Snow overlay (pure CSS, light) */
+    body.xmas::before{
+      content:"";
+      position:fixed;inset:-200px 0 0 0;
+      pointer-events:none;
+      background-image:
+        radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,.95) 50%, transparent 52%),
+        radial-gradient(2px 2px at 30% 60%, rgba(255,255,255,.85) 50%, transparent 52%),
+        radial-gradient(1.5px 1.5px at 70% 35%, rgba(255,255,255,.9) 50%, transparent 52%),
+        radial-gradient(1.5px 1.5px at 85% 70%, rgba(255,255,255,.8) 50%, transparent 52%),
+        radial-gradient(1px 1px at 55% 10%, rgba(255,255,255,.8) 50%, transparent 52%),
+        radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,.75) 50%, transparent 52%);
+      background-size: 420px 420px, 520px 520px, 460px 460px, 560px 560px, 380px 380px, 600px 600px;
+      animation:snowFall 10s linear infinite;
+      opacity:.45;
+    }
+    @keyframes snowFall{
+      from{transform:translateY(-120px)}
+      to{transform:translateY(220px)}
+    }
+
+    /* Gift card print */
+    .giftPrint{
+      border:2px dashed rgba(255,255,255,.18);
+      border-radius:16px;
+      padding:14px;
+      display:grid;
+      grid-template-columns: 1fr 220px;
+      gap:14px;
+      align-items:center;
+      background:#fff;
+      color:#111;
+    }
+    .giftPrint h2{margin:0}
+    .giftPrint .meta{opacity:.85}
+    .giftPrint canvas{background:#fff;border:1px solid #eee;border-radius:10px}
+    @media print{
+      body{max-width:none;margin:0;padding:0;background:#fff;color:#111}
+      .noPrint{display:none !important}
+      #tab-card{display:block !important}
+      #printArea{display:block !important}
+      .card{box-shadow:none;background:#fff;color:#111;border-color:#ddd}
     }
   </style>
 </head>
 
-<body>
-  <div class="container">
-    <h1 id="appTitle">Reto's personal Game</h1>
-    <div class="muted" id="appSubtitle">Dein Lebens-Game: Quests abschließen, XP sammeln, leveln. Alles bleibt lokal auf deinem Gerät.</div>
+<body class="pixel xmas">
+  <h1 id="appTitle">Reto's personal Game</h1>
+  <div class="muted" id="appSubtitle">Deine Quests werden lokal auf deinem Gerät gespeichert (kein Account, kein Server).</div>
+
+  <!-- Update Bar -->
+  <div id="updateBar" class="card noPrint hidden" style="border-color:var(--accent2)">
+    <div class="row split">
+      <div>
+        <b>Update verfügbar</b>
+        <div class="muted">Neu laden, um die neueste Version zu verwenden.</div>
+      </div>
+      <div class="row">
+        <button id="reloadNow" class="btn-accent" type="button">Neu laden</button>
+        <button id="reloadLater" type="button">Später</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card noPrint">
+    <div class="row split">
+      <div class="tabs" id="tabs">
+        <button data-tab="quests" class="active">🗡️ Quests</button>
+        <button data-tab="story">📜 Story</button>
+        <button data-tab="game">🐍 Snake</button>
+        <button data-tab="card">🎁 QR & Karte</button>
+      </div>
+      <div class="row">
+        <span class="kbd" title="Funktioniert offline, sobald einmal geöffnet">offline</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Geschenk-Intro Modal -->
+  <div id="giftModalBack" class="modalBack hidden" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="titleRow">
+        <div>
+          <div class="muted">Reto's personal Game</div>
+          <h2 style="margin:.25rem 0 0 0" id="giftModalTitle">🎄 Quest-Start</h2>
+        </div>
+        <button id="giftClose" title="Schließen" type="button">✕</button>
+      </div>
+
+      <div id="giftModalText" style="margin-top:10px;line-height:1.5"></div>
+      <pre class="storyBox" id="giftModalStory"></pre>
+
+      <div class="row" style="margin-top:14px">
+        <button id="giftStart" class="btn-accent" type="button">Los geht’s</button>
+        <div class="muted">Ziel: jeden Tag kleine Quests → XP → Level → Achievements.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: QUESTS -->
+  <div id="tab-quests">
+    <div class="card">
+      <div class="row">
+        <div class="stat"><div class="muted">Level</div><div style="font-size:28px" id="level">1</div></div>
+        <div class="stat"><div class="muted">XP</div><div style="font-size:28px"><span id="xp">0</span> / <span id="xpNext">100</span></div></div>
+        <div class="stat"><div class="muted">Coins</div><div style="font-size:28px" id="coins">0</div></div>
+        <div class="stat"><div class="muted">Streak (Tage)</div><div style="font-size:28px" id="streak">0</div></div>
+        <div class="dial" title="Fokus-Timer (Mini)"><span id="timerTxt">00:00</span></div>
+        <button id="timerBtn" type="button">▶ Fokus 15:00</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <h3 style="margin:0">Quests</h3>
+        <button id="newDaily" type="button">↻ Daily Quests</button>
+        <button id="newWeekly" type="button">↻ Weekly Quests</button>
+        <button id="reset" class="danger" type="button">Reset</button>
+      </div>
+      <div class="muted" style="margin-top:8px">Tipp: Für den Retro-Daily kannst du „Daily: Snake-Run“ in den Geschenk-Einstellungen aktivieren.</div>
+      <div id="questList"></div>
+    </div>
 
     <div class="card">
       <div class="row split">
-        <div class="tabs" id="tabs">
-          <button data-tab="quests" class="active">🗡️ Quests</button>
-          <button data-tab="story">📜 Geschenk & Story</button>
-          <button data-tab="snake">🐍 Snake</button>
-          <button data-tab="settings">⚙️ Einstellungen</button>
-        </div>
+        <h3 style="margin:0">Eigene Quests (anpassbar)</h3>
         <div class="row">
-          <span class="kbd" title="Funktioniert auch offline als PWA">offline/PWA</span>
+          <button id="exportBtn" type="button">Export</button>
+          <button id="importBtn" type="button">Import</button>
         </div>
       </div>
+
+      <div class="row" style="margin-top:10px">
+        <input id="cqTitle" class="grow" placeholder="Titel (z.B. 10 Min lesen)">
+        <input id="cqDesc" class="grow" placeholder="Beschreibung (optional)">
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <input id="cqTag" placeholder="Tag (z.B. Lernen)" style="width:160px">
+        <select id="cqType" style="width:140px">
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="boss">Boss</option>
+        </select>
+        <input id="cqXP" type="number" min="0" value="30" style="width:120px" title="XP">
+        <input id="cqCoins" type="number" min="0" value="5" style="width:120px" title="Coins">
+        <button id="cqAdd" type="button">＋ Hinzufügen</button>
+        <button id="cqCancel" class="danger" style="display:none" type="button">Abbrechen</button>
+      </div>
+
+      <div class="muted" style="margin-top:8px">
+        Deine Quests werden beim Generieren automatisch mit den Standard-Quests gemischt (und lokal gespeichert).
+      </div>
+
+      <div id="customQuestList"></div>
     </div>
 
-    <!-- Geschenk-Intro Modal -->
-    <div id="giftModalBack" class="modalBack hidden" role="dialog" aria-modal="true">
-      <div class="modal">
-        <div class="titleRow">
-          <div>
-            <div class="muted" id="giftModalAppName">Reto's personal Game</div>
-            <h2 style="margin:.25rem 0 0 0" id="giftModalTitle">🎄 Frohe Weihnachten!</h2>
-          </div>
-          <button id="giftClose" title="Schließen">✕</button>
-        </div>
-
-        <div id="giftModalText" style="margin-top:10px;line-height:1.5"></div>
-        <pre class="storyBox" id="giftModalStory"></pre>
-
-        <div class="row" style="margin-top:14px">
-          <button id="giftStart" class="btn-accent">Los geht’s</button>
-          <button id="giftEdit" style="margin-left:auto">Anpassen</button>
-        </div>
-      </div>
+    <div class="card">
+      <h3 style="margin-top:0">Achievements</h3>
+      <div id="ach"></div>
     </div>
 
-    <!-- TAB: QUESTS -->
-    <div id="tab-quests">
-      <div class="card">
+    <div class="card">
+      <h3 style="margin-top:0">Log</h3>
+      <ul id="log"></ul>
+    </div>
+  </div>
+
+  <!-- TAB: STORY -->
+  <div id="tab-story" class="hidden">
+    <div class="card">
+      <div class="row split">
+        <h3 style="margin:0">📜 Quest Story</h3>
+        <button id="storyShow" class="btn-accent" type="button">Intro anzeigen</button>
+      </div>
+      <div class="muted" style="margin-top:8px">RPG-Intro-Text. Du kannst ihn später komplett personalisieren.</div>
+      <pre class="storyBox" id="storyPreview"></pre>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Story bearbeiten</h3>
+      <textarea id="giftStory" placeholder="Du bist der Held... Mission: 2026 ..."></textarea>
+      <div class="row" style="margin-top:10px">
+        <button id="storySave" class="btn-accent" type="button">Speichern</button>
+        <button id="storyReset" type="button">Zurücksetzen</button>
+      </div>
+      <div class="muted" style="margin-top:8px">Alles wird lokal im Browser gespeichert. Kein Account nötig.</div>
+    </div>
+  </div>
+
+  <!-- TAB: GAME (SNAKE) -->
+  <div id="tab-game" class="hidden">
+    <div class="card">
+      <div class="row split">
+        <h3 style="margin:0">🐍 Snake (Retro)</h3>
         <div class="row">
-          <div class="stat"><div class="muted">Level</div><div style="font-size:28px" id="level">1</div></div>
-          <div class="stat"><div class="muted">XP</div><div style="font-size:28px"><span id="xp">0</span> / <span id="xpNext">100</span></div></div>
-          <div class="stat"><div class="muted">Coins</div><div style="font-size:28px" id="coins">0</div></div>
-          <div class="stat"><div class="muted">Streak (Tage)</div><div style="font-size:28px" id="streak">0</div></div>
-        </div>
-        <div class="muted" style="margin-top:10px;line-height:1.4">
-          Idee: <b>1 kleine Quest pro Tag</b> reicht. Konsistenz schlägt Perfektion.
+          <span class="pill" id="snakeHighPill">Highscore: 0</span>
+          <span class="pill" id="snakeDailyPill">Daily: bereit</span>
         </div>
       </div>
 
-      <div class="card">
-        <div class="row split">
-          <div>
-            <h3 style="margin:0">Quests</h3>
-            <div class="muted" style="margin-top:6px">Generiere Dailies/Weeklies oder erstelle eigene Quests.</div>
-          </div>
-          <div class="row">
-            <button id="newDaily" class="btn-accent">↻ Daily Quests</button>
-            <button id="newWeekly">↻ Weekly Quests</button>
-            <button id="reset" class="danger">Reset</button>
-          </div>
-        </div>
+      <div class="snakeHUD" style="margin-top:10px">
+        <button id="snakeStart" class="btn-accent" type="button">▶ Start</button>
+        <button id="snakePause" type="button">⏸ Pause</button>
+        <button id="snakeReset" type="button">↺ Reset Run</button>
 
-        <div id="questList" style="margin-top:10px"></div>
-      </div>
-
-      <div class="card">
-        <div class="row split">
-          <h3 style="margin:0">Eigene Quests (anpassbar)</h3>
-          <div class="row">
-            <button id="exportBtn">Export</button>
-            <button id="importBtn">Import</button>
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:10px">
-          <input id="cqTitle" class="grow" placeholder="Titel (z.B. 10 Min Lesen)">
-          <input id="cqDesc" class="grow" placeholder="Beschreibung (optional)">
-        </div>
-
-        <div class="row" style="margin-top:10px">
-          <input id="cqTag" placeholder="Tag (z.B. Lernen)" style="max-width:220px">
-          <select id="cqType" style="max-width:160px">
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="boss">Boss</option>
+        <label class="row" style="gap:6px">
+          <span class="muted">Speed</span>
+          <select id="snakeSpeed">
+            <option value="3">Langsam</option>
+            <option value="5" selected>Normal</option>
+            <option value="7">Schnell</option>
+            <option value="9">Ultra</option>
           </select>
-          <input id="cqXP" type="number" min="0" value="30" style="max-width:140px" title="XP">
-          <input id="cqCoins" type="number" min="0" value="5" style="max-width:140px" title="Coins">
-          <button id="cqAdd" class="btn-accent">＋ Hinzufügen</button>
-          <button id="cqCancel" class="danger hidden">Abbrechen</button>
-        </div>
+        </label>
 
-        <div class="muted" style="margin-top:8px">
-          Eigene Quests werden beim Generieren mit Standard-Quests gemischt. Alles bleibt lokal gespeichert.
-        </div>
+        <label class="row" style="gap:6px">
+          <input id="snakeWrapToggle" type="checkbox">
+          <span>Wrap-around (keine Wände)</span>
+        </label>
 
-        <div id="customQuestList" style="margin-top:10px"></div>
+        <label class="row" style="gap:6px">
+          <input id="snakeRampToggle" type="checkbox" checked>
+          <span>Speed steigt mit Score</span>
+        </label>
+
+        <label class="row" style="gap:6px">
+          <input id="snakeDailyQuestToggle" type="checkbox" checked>
+          <span>Daily: 1 Run pro Tag (Quest + Bonus)</span>
+        </label>
       </div>
 
-      <div class="card">
-        <h3 style="margin-top:0">Achievements</h3>
-        <div id="ach"></div>
-      </div>
-
-      <div class="card">
-        <h3 style="margin-top:0">Log</h3>
-        <ul id="log" style="margin:0;padding-left:18px"></ul>
-      </div>
-    </div>
-
-    <!-- TAB: STORY / GIFT -->
-    <div id="tab-story" class="hidden">
-      <div class="card">
-        <div class="row split">
-          <div>
-            <h3 style="margin:0">🎁 Weihnachtsgeschenk-Intro</h3>
-            <div class="muted" style="margin-top:6px">
-              Start-Text fürs Geschenk. Später kannst du ihn für jede Person komplett personalisieren oder den Geschenkmodus ganz ausschalten.
-            </div>
+      <div class="row" style="margin-top:10px;gap:14px">
+        <canvas id="snakeCanvas" width="320" height="320" aria-label="Snake Spiel"></canvas>
+        <div class="grow" style="min-width:260px">
+          <div class="pill" id="snakeScorePill">Score: 0</div>
+          <div style="margin-top:10px" class="muted">
+            Steuerung: <span class="kbd">↑</span> <span class="kbd">↓</span> <span class="kbd">←</span> <span class="kbd">→</span> oder <span class="kbd">WASD</span><br/>
+            Daily-Quest: mind. <b>5 Punkte</b> → Belohnung (1× pro Tag).<br/>
+            Highscore-Bonus: wenn du deinen Highscore schlägst.
           </div>
-          <div class="row">
-            <button id="storyShow" class="btn-accent">Intro anzeigen</button>
+
+          <div class="dpad" aria-label="Snake Steuerkreuz (Touch)">
+            <span class="empty"></span>
+            <button id="btnUp" type="button">↑</button>
+            <span class="empty"></span>
+
+            <button id="btnLeft" type="button">←</button>
+            <button id="btnPause" type="button">⏸</button>
+            <button id="btnRight" type="button">→</button>
+
+            <span class="empty"></span>
+            <button id="btnDown" type="button">↓</button>
+            <span class="empty"></span>
           </div>
-        </div>
 
-        <div class="row" style="margin-top:12px">
-          <textarea id="giftMsg"></textarea>
-        </div>
-
-        <div class="row" style="margin-top:10px">
-          <button id="giftMsgSave" class="btn-accent">Speichern</button>
-          <button id="giftMsgReset">Zurücksetzen</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="row split">
-          <div>
-            <h3 style="margin:0">📜 Story / Mission (optional)</h3>
-            <div class="muted" style="margin-top:6px">Dieser Text ist wie ein “Quest-Briefing”.</div>
+          <div class="muted" style="margin-top:8px">
+            Tipp (Handy): Wischen oder D-Pad benutzen. Tap auf ⏸ pausiert.
           </div>
-        </div>
-        <textarea id="giftStory"></textarea>
 
-        <div class="row" style="margin-top:10px">
-          <button id="storySave" class="btn-accent">Speichern</button>
-          <button id="storyReset">Zurücksetzen</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3 style="margin-top:0">Wie es später personalisierbar bleibt</h3>
-        <div class="muted" style="line-height:1.5">
-          In den Einstellungen kannst du Titel/Name ändern und den Geschenkmodus deaktivieren (dann erscheint das Intro nicht mehr).
-          Der App-Inhalt (XP, Quests, Achievements) bleibt trotzdem erhalten.
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB: SNAKE -->
-    <div id="tab-snake" class="hidden">
-      <div class="card">
-        <div class="row split">
-          <div>
-            <h3 style="margin:0">🐍 Snake (läuft auch auf dem Handy)</h3>
-            <div class="muted" style="margin-top:6px">
-              Steuerung: Pfeile/WASD am Computer – oder D-Pad unten auf dem Smartphone.
-            </div>
+          <div style="margin-top:12px">
+            <button id="snakeClaim" class="btn-accent" type="button">Daily-Bonus prüfen</button>
           </div>
-          <div class="row">
-            <span class="pill" id="snakeHighPill">Highscore: 0</span>
-          </div>
-        </div>
-
-        <div class="hud" style="margin-top:10px">
-          <button id="snakeStart" class="btn-accent">▶ Start</button>
-          <button id="snakePause">⏸ Pause</button>
-          <button id="snakeReset">↺ Reset</button>
-          <label class="row" style="gap:6px">
-            <span class="muted">Speed</span>
-            <select id="snakeSpeed">
-              <option value="7">Langsam</option>
-              <option value="10" selected>Normal</option>
-              <option value="14">Schnell</option>
-              <option value="18">Ultra</option>
-            </select>
-          </label>
-          <span class="pill" id="snakeScorePill">Score: 0</span>
-        </div>
-
-        <div class="row" style="margin-top:12px;gap:14px;align-items:flex-start">
-          <canvas id="snakeCanvas" width="320" height="320" aria-label="Snake Spiel"></canvas>
-          <div class="grow" style="min-width:260px">
-            <div class="muted" style="line-height:1.5">
-              Bonus: Wenn du deinen Highscore schlägst, bekommst du XP & Coins.
-            </div>
-            <div class="muted" style="margin-top:10px" id="snakeMsg"></div>
-
-            <div class="dpad" aria-label="Snake D-Pad (Touch)">
-              <span class="empty"></span>
-              <button data-dir="up" aria-label="Up">↑</button>
-              <span class="empty"></span>
-
-              <button data-dir="left" aria-label="Left">←</button>
-              <button data-dir="down" aria-label="Down">↓</button>
-              <button data-dir="right" aria-label="Right">→</button>
-
-              <span class="empty"></span>
-              <span class="empty"></span>
-              <span class="empty"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB: SETTINGS -->
-    <div id="tab-settings" class="hidden">
-      <div class="card">
-        <h3 style="margin-top:0">⚙️ Einstellungen</h3>
-
-        <div class="row" style="margin-top:10px">
-          <div class="grow">
-            <div class="muted">App-Titel</div>
-            <input id="setTitle" placeholder="z.B. Reto's personal Game">
-          </div>
-          <div class="grow">
-            <div class="muted">Name (z.B. Reto)</div>
-            <input id="setName" placeholder="z.B. Reto">
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:10px">
-          <label class="row" style="gap:8px">
-            <input id="setGiftMode" type="checkbox">
-            <span>Geschenkmodus aktiv (Intro beim Start anzeigen)</span>
-          </label>
-        </div>
-
-        <div class="row" style="margin-top:10px">
-          <button id="settingsSave" class="btn-accent">Speichern</button>
-          <button id="openIntro">Intro anzeigen</button>
-        </div>
-
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,.12);margin:14px 0">
-
-        <h4 style="margin:0 0 6px">🔒 Backup / Gerätewechsel</h4>
-        <div class="muted" style="line-height:1.5">
-          Diese App ist <b>local-first</b>: Daten bleiben auf dem Gerät (LocalStorage). Wenn Reto sie auf einem neuen Handy/Browser nutzen will,
-          braucht er <b>Export → Import</b>.
-        </div>
-
-        <div class="row" style="margin-top:10px">
-          <button id="exportAll" class="btn-accent">Export (alles)</button>
-          <button id="importAll">Import (alles)</button>
-        </div>
-
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,.12);margin:14px 0">
-
-        <h4 style="margin:0 0 6px">🌍 Online bereitstellen</h4>
-        <div class="muted" style="line-height:1.5">
-          Du kannst die App gratis online hosten (z.B. GitHub Pages / Netlify). Der Link ist dann erreichbar – aber die Daten bleiben trotzdem lokal pro Gerät.
+          <div class="muted" style="margin-top:8px" id="snakeMsg"></div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- TAB: CARD / QR -->
+  <div id="tab-card" class="hidden">
+    <div class="card">
+      <div class="row split">
+        <h3 style="margin:0">🎁 Geschenkmodus</h3>
+        <div class="row">
+          <button id="giftPreview" type="button">Intro anzeigen</button>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <input id="giftName" class="grow" placeholder="Name (z.B. Reto)">
+        <select id="giftTheme" style="width:220px">
+          <option value="xmas">Weihnachts-Akzente</option>
+          <option value="retro">Retro (Monospace)</option>
+          <option value="classic">Classic</option>
+        </select>
+      </div>
+
+      <div style="margin-top:10px">
+        <textarea id="giftMsg" placeholder="Kurze Nachricht (z.B. Frohe Weihnachten! 🎄)"></textarea>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <label class="row" style="gap:6px">
+          <input id="giftPixel" type="checkbox" checked>
+          <span>Pixel-Look aktiv</span>
+        </label>
+        <label class="row" style="gap:6px">
+          <input id="giftSnakeDaily" type="checkbox" checked>
+          <span>Daily: Snake-Run automatisch zu Dailies hinzufügen</span>
+        </label>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <button id="giftSave" class="btn-accent" type="button">Speichern</button>
+        <div class="muted">Du kannst später alles personalisieren – alles bleibt lokal gespeichert.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row split">
+        <h3 style="margin:0">📎 QR-Code & Karte</h3>
+        <button id="printBtn" class="btn-accent" type="button">🖨️ Drucken</button>
+      </div>
+      <div class="muted" style="margin-top:8px">
+        Gib hier deinen Link zur App ein → QR-Code scannen → fertig.
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <input id="qrUrl" class="grow" placeholder="https://... (Link zur App)">
+        <button id="qrGen" type="button">QR erzeugen</button>
+      </div>
+
+      <div id="printArea" style="margin-top:12px">
+        <div class="giftPrint">
+          <div>
+            <div class="muted">Reto's personal Game — Geschenk</div>
+            <h2 id="cardTitle">Für ...</h2>
+            <div class="meta" id="cardMsg" style="margin-top:8px"></div>
+            <div class="meta" style="margin-top:10px">Scanne den QR-Code oder öffne den Link.</div>
+            <div class="meta" id="cardUrl" style="margin-top:6px"></div>
+          </div>
+          <div style="display:grid;justify-items:end;gap:8px">
+            <canvas id="qrCanvas" width="200" height="200"></canvas>
+            <div class="muted" style="font-size:12px">QR-Code (offline erzeugt)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">🎄 Special Weihnachts-Achievements</h3>
+      <div class="muted">Bonus-Achievements für Weihnachts-Quests & Snake.</div>
+      <div style="margin-top:10px" id="xmasAchHint"></div>
+    </div>
+  </div>
+
 <script>
-  // ------------------------------
-  // Core config
-  // ------------------------------
-  const DEFAULT_APP_TITLE = "Reto's personal Game";
-  const STORAGE_KEY = "retos_personal_game_v3";
-
+  const KEY="retos_personal_game_v1";
   const el = (id)=>document.getElementById(id);
-  const $ = (q)=>document.querySelector(q);
-  const $$ = (q)=>Array.from(document.querySelectorAll(q));
 
+  /* =========================
+     Service Worker: Update-Flow
+     ========================= */
+  (function setupServiceWorker(){
+    if(!("serviceWorker" in navigator)) return;
+
+    const updateBar = document.getElementById("updateBar");
+    const reloadNow = document.getElementById("reloadNow");
+    const reloadLater = document.getElementById("reloadLater");
+
+    let newWorker = null;
+
+    function showUpdate(){ updateBar && updateBar.classList.remove("hidden"); }
+    function hideUpdate(){ updateBar && updateBar.classList.add("hidden"); }
+
+    navigator.serviceWorker.register("./sw.js").then((reg) => {
+      reg.addEventListener("updatefound", () => {
+        const installing = reg.installing;
+        if(!installing) return;
+
+        installing.addEventListener("statechange", () => {
+          if(installing.state === "installed" && navigator.serviceWorker.controller){
+            newWorker = installing;
+            showUpdate();
+          }
+        });
+      });
+
+      if(reg.update) reg.update().catch(()=>{});
+    }).catch(()=>{});
+
+    reloadNow && reloadNow.addEventListener("click", () => {
+      hideUpdate();
+      if(newWorker){
+        newWorker.postMessage({type:"SKIP_WAITING"});
+      } else {
+        location.reload();
+      }
+    });
+    reloadLater && reloadLater.addEventListener("click", hideUpdate);
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      location.reload();
+    });
+  })();
+
+  // --- Helpers ---
+  function toInt(v, fallback=0){ const n=parseInt(v,10); return Number.isFinite(n)?n:fallback; }
   function todayISO(){ const d=new Date(); d.setHours(0,0,0,0); return d.toISOString().slice(0,10); }
   function yesterdayISO(){ const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); }
-  function toInt(v, fallback=0){ const n=parseInt(v,10); return Number.isFinite(n)?n:fallback; }
   function xpForNext(level){ return 100 + (level-1)*60; }
 
-  // ------------------------------
-  // Text templates (gift)
-  // ------------------------------
-  function defaultGiftMessage(name){
-    const n = (name||"Reto").trim() || "Reto";
-    return `Frohe Weihnachten ${n}! 🎄
-Auf Weihnachten folgt bald ein neues Jahr mit neuen Abenteuern und Missionen. Dazu möchte ich dir dein eigenes Lebens-Game schenken, in dem du dir selbst Ziele setzt und sie entsprechend erreichen kannst.
+  // --- Achievements ---
+  const ACH_LABELS = {
+    firstQuest: "Erste Quest",
+    quest10: "Der Grind (10 Quests)",
+    boss1: "Boss besiegt (1 Bosskampf)",
+    streak3: "Streak x3",
+    lvl5: "Level 5",
+    focus1: "Fokus (1 Timer abgeschlossen)",
+
+    xmasMulled: "🎄 Glühwein-Quest",
+    xmasRaid: "🎄 Family Raid",
+    winterGrind: "🎄 Wintergrind (5 Xmas-Quests)",
+
+    snake5: "🐍 Snake: 5 Punkte",
+    snake20: "🐍 Snake: 20 Punkte",
+    snakeHS: "🐍 Highscore geknackt"
+  };
+
+  function defaultGiftMessage(){
+    return `Frohe Weihnachten, Reto! 🎄
+Nach Weihnachten folgt bald ein neues Jahr mit neuen Abenteuern und Missionen. Dazu möchte ich dir dein eigenes Lebens-Game schenken, in dem du dir selbst Ziele setzt und sie Schritt für Schritt erreichen kannst.
 Hier ist dein persönlicher Game-Modus – jeden Tag kleine Missionen, XP sammeln und leveln.`;
   }
 
-  function defaultStory(name){
-    const n = (name||"Held").trim() || "Held";
+  function defaultStoryTemplate(name){
+    const n = name ? name : "Held";
     return `Du bist ${n}.
 
-Mission: 2026 (und darüber hinaus).
+Mission: 2026.
 
 Dein Auftrag:
-- Setze dir realistische Quests.
-- Erledige jeden Tag mindestens 1 kleine Mission.
-- Sammle XP, level auf – und bleib dran.
+- Jeden Tag 1–3 kleine Quests erledigen.
+- XP sammeln, Coins verdienen, leveln.
+- Und ganz nebenbei: das echte Leben wie ein Game spielen.
 
-Regel #1: Klein & konstant schlägt perfekt.
-Regel #2: Wenn es stressig wird: 1 Mini-Quest statt gar nichts.
+Regel #1: klein & konstant schlägt perfekt.
+Regel #2: Wenn’s stressig wird: Fokus-Timer + 1 Mini-Quest.
 
 Viel Erfolg! 🎄`;
   }
 
-  // ------------------------------
-  // Achievements
-  // ------------------------------
-  const ACH = {
-    firstQuest: "Erste Quest",
-    quest10: "Der Grind (10 Quests)",
-    boss1: "Boss besiegt (1 Boss-Quest)",
-    streak3: "Streak x3",
-    lvl5: "Level 5",
-    snake5: "Snake: 5 Punkte",
-    snake20: "Snake: 20 Punkte",
-    snakeHS: "Snake: Highscore geknackt"
-  };
-
-  // ------------------------------
-  // Default state + persistence
-  // ------------------------------
   function defaultState(){
     return {
-      meta:{
-        title: DEFAULT_APP_TITLE,
-        name: "Reto",
-        giftMode: true
-      },
-      progress:{
-        level:1, xp:0, coins:0, streak:0, lastDay:null
-      },
+      level:1, xp:0, coins:0, streak:0, lastDay:null,
       quests:[],
       customQuests:[],
-      stats:{done:0,boss:0},
-      ach:{},
-      log:[],
+      log:[], ach:{}, stats:{done:0,boss:0,focusDone:0,xmasDone:0},
       ui:{tab:"quests"},
       gift:{
-        message:"",
+        recipientName:"Reto",
+        message: defaultGiftMessage(),
         story:"",
-        introSeen:false
+        theme:"xmas",
+        pixel:true,
+        snakeDailyQuest:true,
+        introSeen:false,
+        shareUrl:""
       },
       game:{
-        snakeHighScore:0
+        snakeHighScore:0,
+        snakeLastDailyDone:null,
+        snakeDailyEnabled:true,
+        snakePendingDaily:false,
+        snakeWrap:false,
+        snakeRamp:true
       }
     };
   }
@@ -540,111 +675,117 @@ Viel Erfolg! 🎄`;
     const d = defaultState();
     if(!s || typeof s!=="object") s = d;
 
-    s.meta = s.meta || {...d.meta};
-    s.meta.title = String(s.meta.title || d.meta.title);
-    s.meta.name = String(s.meta.name || d.meta.name);
-    if(typeof s.meta.giftMode!=="boolean") s.meta.giftMode = d.meta.giftMode;
+    if(!s.stats) s.stats = {...d.stats};
+    if(!s.ach) s.ach = {};
+    if(!Array.isArray(s.customQuests)) s.customQuests = [];
+    if(!Array.isArray(s.quests)) s.quests = [];
+    if(!Array.isArray(s.log)) s.log = [];
+    if(!s.ui) s.ui = {tab:"quests"};
+    if(typeof s.ui.tab!=="string") s.ui.tab="quests";
 
-    s.progress = s.progress || {...d.progress};
-    s.progress.level = toInt(s.progress.level,1);
-    s.progress.xp = toInt(s.progress.xp,0);
-    s.progress.coins = toInt(s.progress.coins,0);
-    s.progress.streak = toInt(s.progress.streak,0);
-    s.progress.lastDay = s.progress.lastDay ? String(s.progress.lastDay) : null;
+    if(!s.gift || typeof s.gift!=="object") s.gift = {...d.gift};
+    s.gift.recipientName = String(s.gift.recipientName||"Reto");
+    s.gift.message = String(s.gift.message||d.gift.message);
+    s.gift.story = String(s.gift.story||"");
+    if(!["xmas","retro","classic"].includes(s.gift.theme)) s.gift.theme="xmas";
+    s.gift.pixel = (s.gift.pixel!==false);
+    s.gift.snakeDailyQuest = (s.gift.snakeDailyQuest!==false);
+    if(typeof s.gift.introSeen!=="boolean") s.gift.introSeen=false;
+    s.gift.shareUrl = String(s.gift.shareUrl||"");
 
-    s.quests = Array.isArray(s.quests)?s.quests:[];
-    s.customQuests = Array.isArray(s.customQuests)?s.customQuests:[];
-    s.stats = s.stats || {...d.stats};
+    if(!s.game || typeof s.game!=="object") s.game = {...d.game};
+    s.game.snakeHighScore = toInt(s.game.snakeHighScore, 0);
+    s.game.snakeLastDailyDone = s.game.snakeLastDailyDone ? String(s.game.snakeLastDailyDone) : null;
+    s.game.snakeDailyEnabled = (s.game.snakeDailyEnabled!==false);
+    s.game.snakePendingDaily = !!s.game.snakePendingDaily;
+    s.game.snakeWrap = !!s.game.snakeWrap;
+    s.game.snakeRamp = (s.game.snakeRamp !== false);
+
     s.stats.done = toInt(s.stats.done,0);
     s.stats.boss = toInt(s.stats.boss,0);
-    s.ach = s.ach || {};
-    s.log = Array.isArray(s.log)?s.log:[];
-    s.ui = s.ui || {tab:"quests"};
-    s.ui.tab = String(s.ui.tab || "quests");
-
-    s.gift = s.gift || {...d.gift};
-    s.gift.message = String(s.gift.message || "");
-    s.gift.story = String(s.gift.story || "");
-    if(typeof s.gift.introSeen!=="boolean") s.gift.introSeen = false;
-
-    s.game = s.game || {...d.game};
-    s.game.snakeHighScore = toInt(s.game.snakeHighScore,0);
+    s.stats.focusDone = toInt(s.stats.focusDone,0);
+    s.stats.xmasDone = toInt(s.stats.xmasDone,0);
 
     return s;
   }
 
   function load(){
     try{
-      const raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      const raw = JSON.parse(localStorage.getItem(KEY));
       return normalizeState(raw || defaultState());
     } catch {
       return normalizeState(defaultState());
     }
   }
-  function save(s){ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+  function save(s){ localStorage.setItem(KEY, JSON.stringify(s)); }
 
-  // ------------------------------
-  // Game logic: xp/coins/level/streak
-  // ------------------------------
   function updateStreak(s){
     const t=todayISO();
-    const p = s.progress;
-    if(!p.lastDay){ p.streak=1; p.lastDay=t; return; }
-    if(p.lastDay===t) return;
-    p.streak = (p.lastDay===yesterdayISO()) ? (p.streak+1) : 1;
-    p.lastDay=t;
+    if(!s.lastDay){ s.streak=1; s.lastDay=t; return; }
+    if(s.lastDay===t) return;
+    s.streak = (s.lastDay===yesterdayISO()) ? (s.streak+1) : 1;
+    s.lastDay=t;
   }
 
   function unlock(s,id){
     if(s.ach[id]) return;
     s.ach[id]=true;
-    alert("Achievement freigeschaltet: " + (ACH[id]||id));
+    alert("Achievement freigeschaltet: " + ACH_LABELS[id]);
   }
 
   function checkAchievements(s){
     if(s.stats.done>=1) unlock(s,"firstQuest");
     if(s.stats.done>=10) unlock(s,"quest10");
     if(s.stats.boss>=1) unlock(s,"boss1");
-    if(s.progress.streak>=3) unlock(s,"streak3");
-    if(s.progress.level>=5) unlock(s,"lvl5");
-    if(s.game.snakeHighScore>=5) unlock(s,"snake5");
-    if(s.game.snakeHighScore>=20) unlock(s,"snake20");
+    if(s.streak>=3) unlock(s,"streak3");
+    if(s.level>=5) unlock(s,"lvl5");
+    if(s.stats.focusDone>=1) unlock(s,"focus1");
+
+    if(s.stats.xmasDone>=1) unlock(s,"xmasMulled");
+    if(s.stats.xmasDone>=3) unlock(s,"xmasRaid");
+    if(s.stats.xmasDone>=5) unlock(s,"winterGrind");
+
+    if((s.game?.snakeHighScore||0) >= 5) unlock(s,"snake5");
+    if((s.game?.snakeHighScore||0) >= 20) unlock(s,"snake20");
   }
 
   function gainRewards(s, xpGain, coinGain, note){
     updateStreak(s);
-    const p = s.progress;
-    p.xp += xpGain;
-    p.coins += coinGain;
+    s.xp += xpGain;
+    s.coins += coinGain;
 
-    while(p.xp >= xpForNext(p.level)){
-      p.xp -= xpForNext(p.level);
-      p.level += 1;
-      s.log.unshift(`${todayISO()} — Levelaufstieg → ${p.level}`);
+    while(s.xp >= xpForNext(s.level)){
+      s.xp -= xpForNext(s.level);
+      s.level += 1;
+      s.log.unshift(`${todayISO()} — Levelaufstieg → ${s.level}`);
     }
     s.log.unshift(`${todayISO()} — +${xpGain} XP, +${coinGain} Coins — ${note}`);
     checkAchievements(s);
   }
 
-  // ------------------------------
-  // Quests (clean + grammar)
-  // ------------------------------
+  // --- Quest pools (Deutsch) ---
   const DAILY_POOL = [
-    {title:"Aufwärm-Quest", desc:"10 Minuten Mobility/Dehnen.", xp:25, coins:5, tag:"Fitness"},
-    {title:"Nebenquest: Schritte", desc:"20 Minuten spazieren gehen.", xp:30, coins:5, tag:"Fitness"},
-    {title:"Fokus-Sprint", desc:"15 Minuten konzentriert arbeiten (ohne Handy).", xp:35, coins:8, tag:"Fokus"},
-    {title:"Inventar aufräumen", desc:"5 Minuten Schreibtisch aufräumen.", xp:18, coins:4, tag:"Ordnung"},
-    {title:"Mini-Quest: Lesen", desc:"10 Minuten lesen.", xp:22, coins:5, tag:"Mindset"},
+    {title:"Aufwärm-Quest", desc:"10 Min Mobility/Dehnen", xp:25, coins:5, tag:"Fitness"},
+    {title:"Nebenquest: Schritte", desc:"20 Min Spaziergang", xp:30, coins:5, tag:"Fitness"},
+    {title:"Raid-Vorbereitung", desc:"Flasche füllen + 1L Wasser", xp:15, coins:4, tag:"Fitness"},
+    {title:"Fokus-Sprint", desc:"15 Min ohne Handy (Studium/Arbeit)", xp:35, coins:8, tag:"Lernen"},
+    {title:"Inventar aufräumen", desc:"Schreibtisch 5 Min aufräumen", xp:18, coins:4, tag:"Ordnung"},
+    {title:"Glühwein-Quest", desc:"Mach dir ein Heissgetränk & gönn dir 10 Min Pause.", xp:25, coins:8, tag:"Weihnachten"},
+    {title:"Plätzchen-Run", desc:"Snack vorbereiten (oder 1 Stück bewusst geniessen).", xp:20, coins:6, tag:"Weihnachten"},
+    {title:"Geschenk-Check", desc:"Schick einer Person eine kurze Nachricht.", xp:22, coins:6, tag:"Weihnachten"},
   ];
 
   const WEEKLY_POOL = [
-    {title:"Dungeon-Run", desc:"3 Trainings diese Woche.", xp:120, coins:30, tag:"Fitness"},
-    {title:"Boss-Route", desc:"1 Fokusblock à 60 Minuten.", xp:100, coins:25, tag:"Fokus"},
-    {title:"Co-op-Quest", desc:"Etwas mit jemandem planen und durchziehen.", xp:70, coins:20, tag:"Sozial"},
+    {title:"Dungeon-Run", desc:"3 Trainings diese Woche", xp:120, coins:30, tag:"Fitness"},
+    {title:"Boss-Route", desc:"1 langer Fokusblock (60 Min)", xp:100, coins:25, tag:"Lernen"},
+    {title:"Co-op-Quest", desc:"Gemeinsam etwas planen (Walk, Game, Kaffee).", xp:70, coins:20, tag:"Sozial"},
+    {title:"Family Raid", desc:"1 Familien-/Freunde-Aktion planen oder durchziehen.", xp:110, coins:28, tag:"Weihnachten"}
   ];
 
-  const BOSS_POOL = [
-    {title:"Boss-Quest: Schwierige Sache", desc:"Eine Aufgabe, die du sonst aufschiebst, anpacken.", xp:160, coins:40, tag:"Boss", boss:true},
+  const BOSSFIGHTS = [
+    {title:"Bosskampf: PR-Versuch", desc:"PR-Versuch oder schwerer Satz", xp:160, coins:40, tag:"Fitness", boss:true},
+    {title:"Bosskampf: Ranked-Disziplin", desc:"Nur 2 Games + Review (kein Tilt)", xp:130, coins:35, tag:"Gaming", boss:true},
+    {title:"Bosskampf: Fest-Modus", desc:"Familien-Event: freundlich bleiben & 1 gutes Gespräch führen.", xp:150, coins:45, tag:"Weihnachten", boss:true}
   ];
 
   function pickUnique(pool, n){
@@ -660,34 +801,44 @@ Viel Erfolg! 🎄`;
     const builtIn =
       type==="daily" ? DAILY_POOL :
       type==="weekly" ? WEEKLY_POOL :
-      type==="boss" ? BOSS_POOL : [];
+      type==="boss" ? BOSSFIGHTS : [];
     const custom = (s.customQuests||[]).filter(q=>q.type===type && q.enabled!==false);
     return [...builtIn, ...custom];
   }
 
+  function ensureSnakeDailyQuest(s){
+    if(!s?.gift?.snakeDailyQuest) return;
+    const id = "snakeDaily-" + todayISO();
+    const already = (s.quests||[]).some(q=>q.id===id);
+    if(already) return;
+    const doneToday = (s.game?.snakeLastDailyDone === todayISO());
+    const q = {
+      id,
+      title:"Daily: Snake-Run",
+      desc:"Spiele 1 Runde Snake (mind. 5 Punkte). Belohnung nach Game Over (1× pro Tag).",
+      xp:25, coins:8, tag:"Retro", done:doneToday,
+      special:"snakeDaily"
+    };
+    s.quests = [q, ...(s.quests||[])];
+  }
+
   function makeDailies(s){
-    const pool = combinedPool(s,"daily");
-    const base = pickUnique(pool, 4).map((q,i)=>({
+    const poolDaily = combinedPool(s, "daily");
+    const base = pickUnique(poolDaily, 4);
+    const bossChance = 0.25;
+    const poolBoss = combinedPool(s, "boss");
+    const maybeBoss = (poolBoss.length && Math.random()<bossChance) ? pickUnique(poolBoss,1) : [];
+    s.quests = [...base, ...maybeBoss].map((q,i)=>({
       id: crypto.randomUUID?.() || String(Date.now()+i),
       ...q,
       done:false
     }));
-    // kleine Boss-Chance
-    if(Math.random()<0.25){
-      const boss = pickUnique(combinedPool(s,"boss"), 1).map((q,i)=>({
-        id: crypto.randomUUID?.() || String(Date.now()+100+i),
-        ...q,
-        done:false
-      }));
-      s.quests = [...base, ...boss];
-    } else {
-      s.quests = base;
-    }
+    ensureSnakeDailyQuest(s);
   }
 
   function makeWeeklies(s){
-    const pool = combinedPool(s,"weekly");
-    s.quests = pickUnique(pool, 4).map((q,i)=>({
+    const poolWeekly = combinedPool(s, "weekly");
+    s.quests = pickUnique(poolWeekly, 4).map((q,i)=>({
       id: crypto.randomUUID?.() || String(Date.now()+i),
       ...q,
       done:false,
@@ -695,174 +846,49 @@ Viel Erfolg! 🎄`;
     }));
   }
 
-  // ------------------------------
-  // Custom quests (CRUD)
-  // ------------------------------
+  // --- Custom quests management ---
   let editingCustomId = null;
-
   function clearCustomForm(){
     editingCustomId = null;
-    el("cqTitle").value="";
-    el("cqDesc").value="";
-    el("cqTag").value="";
-    el("cqType").value="daily";
-    el("cqXP").value="30";
-    el("cqCoins").value="5";
-    el("cqCancel").classList.add("hidden");
-    el("cqAdd").textContent="＋ Hinzufügen";
+    el("cqTitle").value = "";
+    el("cqDesc").value = "";
+    el("cqTag").value = "";
+    el("cqType").value = "daily";
+    el("cqXP").value = "30";
+    el("cqCoins").value = "5";
+    el("cqAdd").textContent = "＋ Hinzufügen";
+    el("cqCancel").style.display = "none";
   }
 
   function upsertCustomQuest(){
-    const s=load();
-    const title = (el("cqTitle").value||"").trim();
+    const s = load();
+    const title = (el("cqTitle").value || "").trim();
     if(!title){ alert("Bitte gib mindestens einen Titel an."); return; }
-
-    const type = el("cqType").value;
     const q = {
       id: editingCustomId || (crypto.randomUUID?.() || String(Date.now())),
       title,
-      desc: (el("cqDesc").value||"").trim(),
-      tag: (el("cqTag").value||"Ohne Tag").trim(),
-      type,
-      xp: Math.max(0,toInt(el("cqXP").value,0)),
-      coins: Math.max(0,toInt(el("cqCoins").value,0)),
-      boss: type==="boss",
-      enabled:true
+      desc: (el("cqDesc").value || "").trim(),
+      tag: (el("cqTag").value || "Ohne Tag").trim(),
+      type: el("cqType").value,
+      xp: Math.max(0, toInt(el("cqXP").value, 0)),
+      coins: Math.max(0, toInt(el("cqCoins").value, 0)),
+      boss: el("cqType").value==="boss" ? true : false,
+      enabled: true
     };
 
-    const list = s.customQuests || [];
-    const idx = list.findIndex(x=>x.id===q.id);
-    if(idx>=0) list[idx] = {...list[idx], ...q};
-    else list.unshift(q);
+    s.customQuests = s.customQuests || [];
+    const idx = s.customQuests.findIndex(x=>x.id===q.id);
+    if(idx>=0) s.customQuests[idx] = {...s.customQuests[idx], ...q};
+    else s.customQuests.unshift(q);
 
-    s.customQuests = list;
     save(s);
     clearCustomForm();
     render();
   }
 
-  // ------------------------------
-  // UI: tabs
-  // ------------------------------
-  function setTab(tab, silent=false){
-    const all = ["quests","story","snake","settings"];
-    all.forEach(t=>{
-      const btn = $(`.tabs button[data-tab="${t}"]`);
-      const panel = el(`tab-${t}`);
-      if(btn) btn.classList.toggle("active", t===tab);
-      if(panel) panel.classList.toggle("hidden", t!==tab);
-    });
-    if(!silent){
-      const s=load(); s.ui.tab = tab; save(s);
-    }
-  }
-
-  // ------------------------------
-  // Gift modal
-  // ------------------------------
-  function openGiftModal(s){
-    const title = s.meta.title || DEFAULT_APP_TITLE;
-    const name = (s.meta.name||"").trim();
-    el("giftModalAppName").textContent = title;
-    el("giftModalTitle").textContent = name ? `🎄 Frohe Weihnachten, ${name}!` : "🎄 Frohe Weihnachten!";
-
-    const msg = (s.gift.message||"").trim() || defaultGiftMessage(name||"Reto");
-    const story = (s.gift.story||"").trim() || defaultStory(name||"Reto");
-
-    el("giftModalText").textContent = msg;
-    el("giftModalStory").textContent = story;
-
-    el("giftModalBack").classList.remove("hidden");
-  }
-  function closeGiftModal(){ el("giftModalBack").classList.add("hidden"); }
-
-  // ------------------------------
-  // Render
-  // ------------------------------
-  function renderHeader(s){
-    const title = (s.meta.title||DEFAULT_APP_TITLE).trim() || DEFAULT_APP_TITLE;
-    const name = (s.meta.name||"").trim();
-    el("appTitle").textContent = name ? `${title} — ${name}` : title;
-    el("appSubtitle").textContent = "Dein Lebens-Game: Quests abschließen, XP sammeln, leveln. Alles bleibt lokal auf deinem Gerät.";
-    document.title = title;
-  }
-
-  function renderQuests(s){
-    const root = el("questList");
-    root.innerHTML="";
-
-    if((s.quests||[]).length===0){
-      const msg=document.createElement("div");
-      msg.className="muted";
-      msg.textContent='Noch keine Quests. Klick „Daily Quests“.';
-      root.appendChild(msg);
-      return;
-    }
-
-    s.quests.forEach(q=>{
-      const div=document.createElement("div");
-      div.className="q";
-
-      const left=document.createElement("div");
-      const titleRow=document.createElement("div");
-
-      const t=document.createElement("span");
-      t.className="qtitle";
-      t.textContent=q.title;
-
-      const pills=document.createElement("span");
-      const pTag=document.createElement("span");
-      pTag.className="pill";
-      pTag.textContent=q.tag || "Ohne Tag";
-      pills.appendChild(pTag);
-
-      if(q.weekly){ const p=document.createElement("span"); p.className="pill"; p.textContent="Weekly"; pills.appendChild(p); }
-      if(q.boss){ const p=document.createElement("span"); p.className="pill"; p.textContent="Boss"; pills.appendChild(p); }
-
-      titleRow.append(t, document.createTextNode(" "), pills);
-
-      const desc=document.createElement("div");
-      desc.className="qdesc";
-      desc.textContent=q.desc || "";
-
-      const meta=document.createElement("div");
-      meta.className="qmeta";
-      meta.textContent=`Belohnung: +${q.xp} XP, +${q.coins} Coins`;
-
-      left.appendChild(titleRow);
-      if(q.desc) left.appendChild(desc);
-      left.appendChild(meta);
-
-      const right=document.createElement("div");
-      const btn=document.createElement("button");
-      btn.dataset.id=q.id;
-      btn.disabled=!!q.done;
-      btn.textContent = q.done ? "✅ Erledigt" : "Abschließen";
-      right.appendChild(btn);
-
-      div.append(left, right);
-      root.appendChild(div);
-
-      btn.addEventListener("click", ()=>{
-        const s2=load();
-        const quest = s2.quests.find(x=>x.id===q.id);
-        if(!quest || quest.done) return;
-
-        quest.done=true;
-        s2.stats.done += 1;
-        if(quest.boss) s2.stats.boss += 1;
-
-        gainRewards(s2, quest.xp, quest.coins, `Quest abgeschlossen: ${quest.title}`);
-        save(s2);
-        render();
-      });
-    });
-  }
-
   function renderCustomQuests(s){
     const root = el("customQuestList");
-    root.innerHTML="";
-
+    root.innerHTML = "";
     const list = (s.customQuests||[]);
     if(list.length===0){
       const msg=document.createElement("div");
@@ -877,31 +903,33 @@ Viel Erfolg! 🎄`;
       div.className="q";
 
       const left=document.createElement("div");
-      const titleRow=document.createElement("div");
 
-      const t=document.createElement("span");
-      t.className="qtitle";
-      t.textContent=q.title;
+      const titleRow=document.createElement("div");
+      const title=document.createElement("span");
+      title.className="qtitle";
+      title.textContent=q.title;
 
       const pills=document.createElement("span");
-      const p1=document.createElement("span"); p1.className="pill"; p1.textContent=q.tag||"Ohne Tag";
-      const p2=document.createElement("span"); p2.className="pill"; p2.textContent=q.type==="daily"?"Daily":q.type==="weekly"?"Weekly":"Boss";
-      pills.append(p1,p2);
-      if(q.enabled===false){ const p=document.createElement("span"); p.className="pill"; p.textContent="Deaktiviert"; pills.appendChild(p); }
+      const pTag=document.createElement("span"); pTag.className="pill"; pTag.textContent=q.tag || "Ohne Tag";
+      const pType=document.createElement("span"); pType.className="pill"; pType.textContent = q.type==="daily"?"Daily":q.type==="weekly"?"Weekly":"Boss";
+      pills.append(pTag, pType);
 
-      titleRow.append(t, document.createTextNode(" "), pills);
+      if(q.enabled===false){
+        const p=document.createElement("span"); p.className="pill"; p.textContent="Deaktiviert"; pills.appendChild(p);
+      }
+
+      titleRow.append(title, document.createTextNode(" "), pills);
+
+      const desc=document.createElement("div");
+      desc.className="qdesc";
+      desc.textContent=q.desc || "";
 
       const meta=document.createElement("div");
       meta.className="qmeta";
       meta.textContent=`+${q.xp} XP, +${q.coins} Coins`;
 
       left.appendChild(titleRow);
-      if(q.desc){
-        const d=document.createElement("div");
-        d.className="qdesc";
-        d.textContent=q.desc;
-        left.appendChild(d);
-      }
+      if(q.desc) left.appendChild(desc);
       left.appendChild(meta);
 
       const right=document.createElement("div");
@@ -909,21 +937,23 @@ Viel Erfolg! 🎄`;
 
       const edit=document.createElement("button");
       edit.textContent="Bearbeiten";
+      edit.type="button";
       edit.addEventListener("click", ()=>{
         editingCustomId = q.id;
-        el("cqTitle").value=q.title||"";
-        el("cqDesc").value=q.desc||"";
-        el("cqTag").value=q.tag||"";
-        el("cqType").value=q.type||"daily";
-        el("cqXP").value=String(q.xp??0);
-        el("cqCoins").value=String(q.coins??0);
-        el("cqCancel").classList.remove("hidden");
-        el("cqAdd").textContent="💾 Speichern";
+        el("cqTitle").value = q.title || "";
+        el("cqDesc").value = q.desc || "";
+        el("cqTag").value = q.tag || "";
+        el("cqType").value = q.type || "daily";
+        el("cqXP").value = String(q.xp ?? 0);
+        el("cqCoins").value = String(q.coins ?? 0);
+        el("cqAdd").textContent = "💾 Speichern";
+        el("cqCancel").style.display = "";
         setTab("quests");
         window.scrollTo({top:0, behavior:"smooth"});
       });
 
       const toggle=document.createElement("button");
+      toggle.type="button";
       toggle.textContent = (q.enabled===false) ? "Aktivieren" : "Deaktivieren";
       toggle.addEventListener("click", ()=>{
         const s2=load();
@@ -936,6 +966,7 @@ Viel Erfolg! 🎄`;
 
       const del=document.createElement("button");
       del.className="danger";
+      del.type="button";
       del.textContent="Löschen";
       del.addEventListener("click", ()=>{
         if(!confirm("Diese eigene Quest wirklich löschen?")) return;
@@ -946,28 +977,206 @@ Viel Erfolg! 🎄`;
         render();
       });
 
-      right.append(edit,toggle,del);
-      div.append(left,right);
+      right.append(edit, toggle, del);
+
+      div.append(left, right);
       root.appendChild(div);
     });
   }
 
-  function renderAchievements(s){
-    el("ach").innerHTML = Object.keys(ACH).map(id=>{
+  // --- Rendering ---
+  function applyTheme(s){
+    document.body.classList.remove("xmas","retro","classic");
+    if(s.gift.theme==="xmas") document.body.classList.add("xmas");
+    if(s.gift.theme==="retro") document.body.classList.add("retro");
+    if(s.gift.theme==="classic") document.body.classList.add("classic");
+    if(s.gift.pixel) document.body.classList.add("pixel");
+    else document.body.classList.remove("pixel");
+  }
+
+  function renderGiftHeader(s){
+    const name = (s.gift.recipientName||"").trim();
+    el("appTitle").textContent = name ? `Reto's personal Game — ${name}` : "Reto's personal Game";
+    el("appSubtitle").textContent = "Deine Quests werden lokal auf deinem Gerät gespeichert (kein Account, kein Server).";
+  }
+
+  function openGiftModal(s){
+    const name = (s.gift.recipientName || "").trim();
+    el("giftModalTitle").textContent = name ? `🎁 Für ${name}` : "🎁 Start";
+    const msg = (s.gift.message || "").trim();
+    el("giftModalText").textContent = msg ? msg : defaultGiftMessage();
+
+    const story = (s.gift.story || "").trim() || defaultStoryTemplate(name);
+    el("giftModalStory").textContent = story;
+
+    el("giftModalBack").classList.remove("hidden");
+  }
+  function closeGiftModal(){ el("giftModalBack").classList.add("hidden"); }
+
+  function renderStory(s){
+    const name = (s.gift.recipientName||"").trim();
+    const story = (s.gift.story || "").trim() || defaultStoryTemplate(name);
+    el("storyPreview").textContent = story;
+    el("giftStory").value = (s.gift.story || "").trim() || story;
+  }
+
+  function renderGiftCard(s){
+    el("giftName").value = s.gift.recipientName || "";
+    el("giftMsg").value = s.gift.message || "";
+    el("giftTheme").value = s.gift.theme || "xmas";
+    el("giftPixel").checked = !!s.gift.pixel;
+    el("giftSnakeDaily").checked = !!s.gift.snakeDailyQuest;
+
+    const url = (s.gift.shareUrl||"").trim() || guessDefaultUrl();
+    el("qrUrl").value = url;
+    renderGiftPrint(s, url);
+    drawQRToCanvas(url, el("qrCanvas"));
+  }
+
+  function renderGiftPrint(s, url){
+    const name = (s.gift.recipientName||"").trim();
+    el("cardTitle").textContent = name ? `Für ${name}` : "Für dich";
+    el("cardMsg").textContent = (s.gift.message||"").trim().replace(/\n/g, " ");
+    el("cardUrl").textContent = url || "";
+  }
+
+  function renderSnakeHeader(s){
+    el("snakeHighPill").textContent = `Highscore: ${s.game.snakeHighScore||0}`;
+    const dailyDone = (s.game.snakeLastDailyDone === todayISO());
+    el("snakeDailyPill").textContent = dailyDone ? "Daily: erledigt ✅" : "Daily: bereit";
+    el("snakeDailyQuestToggle").checked = s.game.snakeDailyEnabled!==false;
+
+    el("snakeWrapToggle").checked = !!s.game.snakeWrap;
+    el("snakeRampToggle").checked = (s.game.snakeRamp !== false);
+    snake.wrap = !!s.game.snakeWrap;
+    snake.ramp = (s.game.snakeRamp !== false);
+  }
+
+  function renderXmasHint(s){
+    const root = el("xmasAchHint");
+    const lines = [
+      "🎄 Glühwein-Quest: schalte frei, indem du Weihnachts-Quests erledigst.",
+      "🎄 Family Raid: nach mehreren Weihnachts-Quests.",
+      "🎄 Wintergrind: 5 Weihnachts-Quests insgesamt.",
+      "🐍 Snake: 5 / 20 Punkte & Highscore-Bonus."
+    ];
+    root.innerHTML = lines.map(t=>`<span class="pill">${t}</span>`).join("");
+  }
+
+  function render(){
+    const s = load();
+    applyTheme(s);
+    renderGiftHeader(s);
+    setTab(s.ui.tab || "quests", {silent:true});
+
+    if(!s.gift.introSeen){
+      openGiftModal(s);
+    }
+
+    el("level").textContent=String(s.level);
+    el("xp").textContent=String(s.xp);
+    el("xpNext").textContent=String(xpForNext(s.level));
+    el("coins").textContent=String(s.coins);
+    el("streak").textContent=String(s.streak);
+
+    // quests
+    const questListEl = el("questList");
+    questListEl.innerHTML="";
+    if((s.quests||[]).length===0){
+      const msg=document.createElement("div");
+      msg.className="muted";
+      msg.textContent='Noch keine Quests. Klicke auf „Daily Quests“.';
+      questListEl.appendChild(msg);
+    } else {
+      s.quests.forEach(q=>{
+        const div=document.createElement("div");
+        div.className="q";
+
+        const left=document.createElement("div");
+
+        const titleRow=document.createElement("div");
+        const title=document.createElement("span");
+        title.className="qtitle";
+        title.textContent=q.title;
+
+        const pills=document.createElement("span");
+        const pillTag=document.createElement("span");
+        pillTag.className="pill";
+        pillTag.textContent=q.tag || "Ohne Tag";
+        pills.appendChild(pillTag);
+
+        if(q.weekly){ const p=document.createElement("span"); p.className="pill"; p.textContent="Weekly"; pills.appendChild(p); }
+        if(q.boss){ const p=document.createElement("span"); p.className="pill"; p.textContent="Boss"; pills.appendChild(p); }
+        if(q.special==="snakeDaily"){ const p=document.createElement("span"); p.className="pill"; p.textContent="Daily"; pills.appendChild(p); }
+
+        titleRow.appendChild(title);
+        titleRow.appendChild(document.createTextNode(" "));
+        titleRow.appendChild(pills);
+
+        const desc=document.createElement("div");
+        desc.className="qdesc";
+        desc.textContent=q.desc || "";
+
+        const meta=document.createElement("div");
+        meta.className="qmeta";
+        meta.textContent=`Reward: +${q.xp} XP, +${q.coins} Coins`;
+
+        left.appendChild(titleRow);
+        if(q.desc) left.appendChild(desc);
+        left.appendChild(meta);
+
+        const right=document.createElement("div");
+        right.className="row";
+        const btn=document.createElement("button");
+        btn.type="button";
+        btn.dataset.id=q.id;
+        btn.disabled=!!q.done;
+        btn.textContent = q.done ? "✅ Erledigt" : (q.special==="snakeDaily" ? "Spielen" : "Abschließen");
+        right.appendChild(btn);
+
+        div.appendChild(left);
+        div.appendChild(right);
+        questListEl.appendChild(div);
+      });
+
+      questListEl.querySelectorAll("button[data-id]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const s2=load();
+          const id=btn.getAttribute("data-id");
+          const q=s2.quests.find(x=>x.id===id);
+          if(!q || q.done) return;
+
+          if(q.special==="snakeDaily"){
+            s2.game.snakePendingDaily = true;
+            save(s2);
+            setTab("game");
+            el("snakeMsg").textContent = "Daily aktiv: Spiele jetzt eine Runde (mind. 5 Punkte), dann bekommst du die Belohnung.";
+            return;
+          }
+
+          q.done=true;
+          s2.stats.done += 1;
+          if(q.boss) s2.stats.boss += 1;
+          if(String(q.tag||"").toLowerCase()==="weihnachten") s2.stats.xmasDone += 1;
+
+          gainRewards(s2, q.xp, q.coins, `Quest abgeschlossen: ${q.title}`);
+          save(s2);
+          render();
+        });
+      });
+    }
+
+    renderCustomQuests(s);
+
+    el("ach").innerHTML = Object.keys(ACH_LABELS).map(id=>{
       const got = !!s.ach[id];
-      return `<span class="pill" title="${got?'Freigeschaltet':'Gesperrt'}">${got?'✅':'🔒'} ${ACH[id]}</span>`;
+      const pill = document.createElement("span");
+      pill.className="pill";
+      pill.title = got ? "Freigeschaltet" : "Gesperrt";
+      pill.textContent = `${got?'✅':'🔒'} ${ACH_LABELS[id]}`;
+      return pill.outerHTML;
     }).join("");
-  }
 
-  function renderStats(s){
-    el("level").textContent=String(s.progress.level);
-    el("xp").textContent=String(s.progress.xp);
-    el("xpNext").textContent=String(xpForNext(s.progress.level));
-    el("coins").textContent=String(s.progress.coins);
-    el("streak").textContent=String(s.progress.streak);
-  }
-
-  function renderLog(s){
     const logEl = el("log");
     logEl.innerHTML="";
     (s.log||[]).slice(0,12).forEach(line=>{
@@ -975,76 +1184,83 @@ Viel Erfolg! 🎄`;
       li.textContent=line;
       logEl.appendChild(li);
     });
-  }
 
-  function renderGiftEditors(s){
-    const name = (s.meta.name||"Reto").trim() || "Reto";
-    el("giftMsg").value = (s.gift.message||"").trim() || defaultGiftMessage(name);
-    el("giftStory").value = (s.gift.story||"").trim() || defaultStory(name);
-  }
-
-  function renderSettings(s){
-    el("setTitle").value = s.meta.title || DEFAULT_APP_TITLE;
-    el("setName").value = s.meta.name || "";
-    el("setGiftMode").checked = !!s.meta.giftMode;
-  }
-
-  function renderSnakeHeader(s){
-    el("snakeHighPill").textContent = `Highscore: ${s.game.snakeHighScore||0}`;
-  }
-
-  function render(){
-    const s=load();
-    renderHeader(s);
-    setTab(s.ui.tab || "quests", true);
-
-    // Gift defaults (only set if empty)
-    if(!s.gift.message) s.gift.message = defaultGiftMessage(s.meta.name||"Reto");
-    if(!s.gift.story) s.gift.story = defaultStory(s.meta.name||"Reto");
-
-    // show intro if giftMode and not seen
-    if(s.meta.giftMode && !s.gift.introSeen){
-      save(s);
-      openGiftModal(s);
-    }
-
-    renderStats(s);
-    renderQuests(s);
-    renderCustomQuests(s);
-    renderAchievements(s);
-    renderLog(s);
-    renderGiftEditors(s);
-    renderSettings(s);
+    renderStory(s);
+    renderGiftCard(s);
     renderSnakeHeader(s);
+    renderXmasHint(s);
 
-    // keep snake score pill in sync
     el("snakeScorePill").textContent = `Score: ${snake.score}`;
   }
 
-  // ------------------------------
-  // Buttons / actions
-  // ------------------------------
-  $$("#tabs button[data-tab]").forEach(b=>{
+  // --- Tabs ---
+  function setTab(tab, opts={}){
+    const tabs = ["quests","story","game","card"];
+    tabs.forEach(t=>{
+      const btn = document.querySelector(`.tabs button[data-tab="${t}"]`);
+      const panel = el(`tab-${t}`);
+      if(btn) btn.classList.toggle("active", t===tab);
+      if(panel) panel.classList.toggle("hidden", t!==tab);
+    });
+
+    if(!opts.silent){
+      const s=load();
+      s.ui.tab = tab;
+      save(s);
+    }
+  }
+
+  // --- Focus timer ---
+  let timer=null, remaining=0;
+  function fmt(sec){
+    const m=String(Math.floor(sec/60)).padStart(2,"0");
+    const s=String(sec%60).padStart(2,"0");
+    return `${m}:${s}`;
+  }
+  function startTimer(){
+    const s=load();
+    if(timer){
+      clearInterval(timer); timer=null; remaining=0;
+      el("timerBtn").textContent="▶ Fokus 15:00";
+      el("timerTxt").textContent="00:00";
+      return;
+    }
+    remaining=15*60;
+    el("timerBtn").textContent="⏸ Stop";
+    el("timerTxt").textContent=fmt(remaining);
+    timer=setInterval(()=>{
+      remaining--;
+      el("timerTxt").textContent=fmt(Math.max(0,remaining));
+      if(remaining<=0){
+        clearInterval(timer); timer=null;
+        el("timerBtn").textContent="▶ Fokus 15:00";
+        s.stats.focusDone += 1;
+        gainRewards(s, 40, 10, "Fokus-Timer abgeschlossen");
+        save(s);
+        render();
+        alert("Fokus abgeschlossen! +40 XP, +10 Coins");
+      }
+    }, 1000);
+  }
+
+  // --- Events ---
+  document.querySelectorAll(".tabs button[data-tab]").forEach(b=>{
     b.addEventListener("click", ()=> setTab(b.getAttribute("data-tab")));
   });
 
   el("newDaily").addEventListener("click", ()=>{ const s=load(); makeDailies(s); save(s); render(); });
   el("newWeekly").addEventListener("click", ()=>{ const s=load(); makeWeeklies(s); save(s); render(); });
-
+  el("timerBtn").addEventListener("click", startTimer);
   el("reset").addEventListener("click", ()=>{
-    if(confirm("Wirklich alles löschen?")){
-      localStorage.removeItem(STORAGE_KEY);
-      render();
-    }
+    if(confirm("Wirklich alles löschen?")){ localStorage.removeItem(KEY); render(); }
   });
 
   el("cqAdd").addEventListener("click", upsertCustomQuest);
   el("cqCancel").addEventListener("click", clearCustomForm);
 
-  // Export/Import: custom quests only
   el("exportBtn").addEventListener("click", async ()=>{
     const s=load();
-    const payload = JSON.stringify({version:1, customQuests:s.customQuests||[]}, null, 2);
+    const payload = JSON.stringify({version:2, customQuests:(s.customQuests||[])}, null, 2);
     try{
       await navigator.clipboard.writeText(payload);
       alert("Export kopiert (JSON).");
@@ -1054,11 +1270,11 @@ Viel Erfolg! 🎄`;
   });
 
   el("importBtn").addEventListener("click", ()=>{
-    const txt = prompt("Füge hier den Export-JSON (Custom Quests) ein:");
+    const txt = prompt("Füge hier den Export-JSON ein:");
     if(!txt) return;
     try{
       const data = JSON.parse(txt);
-      const list = Array.isArray(data?.customQuests) ? data.customQuests : null;
+      const list = Array.isArray(data?.customQuests) ? data.customQuests : Array.isArray(data) ? data : null;
       if(!list) throw new Error("Ungültiges Format");
       const s=load();
       s.customQuests = list.map(q=>({
@@ -1067,8 +1283,8 @@ Viel Erfolg! 🎄`;
         desc: String(q.desc||"").trim(),
         tag: String(q.tag||"Ohne Tag").trim(),
         type: (q.type==="weekly"||q.type==="boss") ? q.type : "daily",
-        xp: Math.max(0,toInt(q.xp,0)),
-        coins: Math.max(0,toInt(q.coins,0)),
+        xp: Math.max(0, toInt(q.xp, 0)),
+        coins: Math.max(0, toInt(q.coins, 0)),
         boss: (q.type==="boss") ? true : !!q.boss,
         enabled: q.enabled!==false
       })).filter(q=>q.title);
@@ -1081,103 +1297,143 @@ Viel Erfolg! 🎄`;
     }
   });
 
-  // Full export/import (device migration)
-  el("exportAll").addEventListener("click", async ()=>{
-    const s=load();
-    const payload = JSON.stringify({version:3, state:s}, null, 2);
-    try{
-      await navigator.clipboard.writeText(payload);
-      alert("Komplett-Export kopiert (JSON).");
-    } catch {
-      prompt("Kopiere den Komplett-Export:", payload);
-    }
+  // Gift settings
+  el("giftSave").addEventListener("click", ()=>{
+    const s = load();
+    s.gift.recipientName = (el("giftName").value || "").trim() || "Reto";
+    s.gift.message = (el("giftMsg").value || "").trim() || defaultGiftMessage();
+    s.gift.theme = (el("giftTheme").value || "xmas");
+    s.gift.pixel = !!el("giftPixel").checked;
+    s.gift.snakeDailyQuest = !!el("giftSnakeDaily").checked;
+
+    if(!s.gift.story) s.gift.story = defaultStoryTemplate(s.gift.recipientName);
+
+    save(s);
+    render();
+    alert("Geschenkmodus gespeichert.");
   });
 
-  el("importAll").addEventListener("click", ()=>{
-    const txt = prompt("Füge hier den Komplett-Export (JSON) ein:");
-    if(!txt) return;
-    try{
-      const data = JSON.parse(txt);
-      if(!data?.state) throw new Error("Ungültiges Format");
-      const s = normalizeState(data.state);
-      save(s);
-      render();
-      alert("Import erfolgreich.");
-    } catch(e){
-      alert("Import fehlgeschlagen: " + (e?.message||"Unbekannter Fehler"));
-    }
-  });
+  el("giftPreview").addEventListener("click", ()=>{ openGiftModal(load()); });
 
-  // Gift modal controls
   el("giftClose").addEventListener("click", closeGiftModal);
   el("giftModalBack").addEventListener("click", (e)=>{ if(e.target===el("giftModalBack")) closeGiftModal(); });
 
   el("giftStart").addEventListener("click", ()=>{
     const s=load();
-    s.gift.introSeen = true;
+    s.gift.introSeen=true;
     save(s);
     closeGiftModal();
     render();
   });
 
-  el("giftEdit").addEventListener("click", ()=>{
-    closeGiftModal();
-    setTab("story");
-  });
-
-  el("storyShow").addEventListener("click", ()=> openGiftModal(load()));
-
-  el("giftMsgSave").addEventListener("click", ()=>{
-    const s=load();
-    s.gift.message = (el("giftMsg").value||"").trim();
-    save(s);
-    alert("Intro-Text gespeichert.");
-    render();
-  });
-
-  el("giftMsgReset").addEventListener("click", ()=>{
-    const s=load();
-    s.gift.message = defaultGiftMessage(s.meta.name||"Reto");
-    save(s);
-    render();
-  });
-
+  // Story editing
   el("storySave").addEventListener("click", ()=>{
     const s=load();
-    s.gift.story = (el("giftStory").value||"").trim();
+    s.gift.story = (el("giftStory").value || "").trim();
     save(s);
-    alert("Story gespeichert.");
     render();
+    alert("Story gespeichert.");
   });
-
   el("storyReset").addEventListener("click", ()=>{
     const s=load();
-    s.gift.story = defaultStory(s.meta.name||"Reto");
+    s.gift.story = defaultStoryTemplate((s.gift.recipientName||"").trim());
     save(s);
     render();
   });
+  el("storyShow").addEventListener("click", ()=> openGiftModal(load()));
 
-  // Settings save
-  el("settingsSave").addEventListener("click", ()=>{
+  // QR / print
+  el("qrGen").addEventListener("click", ()=>{
     const s=load();
-    s.meta.title = (el("setTitle").value||DEFAULT_APP_TITLE).trim() || DEFAULT_APP_TITLE;
-    s.meta.name = (el("setName").value||"").trim() || "Reto";
-    s.meta.giftMode = !!el("setGiftMode").checked;
-
-    // keep defaults aligned
-    if(!s.gift.message) s.gift.message = defaultGiftMessage(s.meta.name);
-    if(!s.gift.story) s.gift.story = defaultStory(s.meta.name);
-
+    const url = (el("qrUrl").value||"").trim();
+    s.gift.shareUrl = url;
     save(s);
-    alert("Einstellungen gespeichert.");
+    renderGiftPrint(s, url);
+    drawQRToCanvas(url, el("qrCanvas"));
+    alert("QR-Code aktualisiert.");
+  });
+  el("printBtn").addEventListener("click", ()=> window.print());
+
+  // Snake daily toggle
+  el("snakeDailyQuestToggle").addEventListener("change", ()=>{
+    const s=load();
+    s.game.snakeDailyEnabled = !!el("snakeDailyQuestToggle").checked;
+    save(s);
     render();
   });
 
-  el("openIntro").addEventListener("click", ()=> openGiftModal(load()));
+  // Wrap + Speed Ramp toggles
+  el("snakeWrapToggle").addEventListener("change", ()=>{
+    const s=load();
+    s.game.snakeWrap = !!el("snakeWrapToggle").checked;
+    save(s);
+    snake.wrap = s.game.snakeWrap;
+  });
 
-  // ------------------------------
-  // Snake (mobile-friendly + touch)
-  // ------------------------------
+  el("snakeRampToggle").addEventListener("change", ()=>{
+    const s=load();
+    s.game.snakeRamp = !!el("snakeRampToggle").checked;
+    save(s);
+    snake.ramp = s.game.snakeRamp;
+    if(snake.running){
+      stopSnakeLoop();
+      startSnakeLoop();
+    }
+  });
+
+  // --- QR Code generator (minimal) ---
+  function drawQRToCanvas(text, canvas){
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(!text){
+      ctx.fillStyle="#111";
+      ctx.font="12px system-ui, Arial";
+      ctx.fillText("Kein Link", 10, 20);
+      return;
+    }
+
+    let qr=null;
+    try{
+      qr = QRCodeModel(0, QRErrorCorrectLevel.M);
+      qr.addData(text);
+      qr.make();
+    } catch(e){
+      ctx.fillStyle="#fff"; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle="#111"; ctx.font="12px system-ui, Arial";
+      const msg = String(e?.message||"QR Fehler");
+      ctx.fillText("QR Fehler:", 10, 22);
+      ctx.fillText(msg.slice(0,36), 10, 40);
+      ctx.fillText("Tipp: Link kürzen.", 10, 58);
+      return;
+    }
+
+    const moduleCount = qr.getModuleCount();
+    const size = Math.floor(Math.min(canvas.width, canvas.height));
+    const cell = Math.floor(size / (moduleCount + 8));
+    const offset = Math.floor((size - cell * moduleCount) / 2);
+
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0,0,size,size);
+
+    ctx.fillStyle = "#111";
+    for(let r=0;r<moduleCount;r++){
+      for(let c=0;c<moduleCount;c++){
+        if(qr.isDark(r,c)){
+          ctx.fillRect(offset + c*cell, offset + r*cell, cell, cell);
+        }
+      }
+    }
+  }
+
+  function guessDefaultUrl(){
+    try{
+      const href = String(location.href||"");
+      if(href.startsWith("http://") || href.startsWith("https://")) return href;
+    } catch {}
+    return "";
+  }
+
+  // --- Snake game implementation ---
   const snake = {
     grid: 20,
     cell: 16,
@@ -1189,7 +1445,10 @@ Viel Erfolg! 🎄`;
     running: false,
     paused: false,
     loop: null,
-    speed: 10
+
+    speed: 5,       // base speed (dropdown)
+    wrap: false,    // walls off
+    ramp: true      // speed increases with score
   };
 
   function randFood(){
@@ -1202,7 +1461,7 @@ Viel Erfolg! 🎄`;
     snake.food = {x,y};
   }
 
-  function resetSnake(){
+  function resetRun(){
     snake.dir = {x:1,y:0};
     snake.nextDir = {x:1,y:0};
     snake.body = [{x:10,y:10},{x:9,y:10},{x:8,y:10}];
@@ -1214,8 +1473,8 @@ Viel Erfolg! 🎄`;
     el("snakeMsg").textContent = "";
   }
 
-  function setSnakeSpeed(){
-    snake.speed = toInt(el("snakeSpeed").value, 10);
+  function setSpeed(){
+    snake.speed = toInt(el("snakeSpeed").value, 5);
     if(snake.running){
       stopSnakeLoop();
       startSnakeLoop();
@@ -1223,21 +1482,27 @@ Viel Erfolg! 🎄`;
   }
 
   function startSnakeLoop(){
-    const interval = Math.max(30, Math.floor(1000 / snake.speed));
+    const base = snake.speed || 5;
+    const extra = (snake.ramp ? Math.min(6, Math.floor(snake.score / 6)) : 0);
+    const effectiveSpeed = base + extra;
+
+    const interval = Math.max(65, Math.floor(1600 / effectiveSpeed));
     snake.loop = setInterval(stepSnake, interval);
   }
+
   function stopSnakeLoop(){
     if(snake.loop){ clearInterval(snake.loop); snake.loop=null; }
   }
 
   function startSnake(){
     if(snake.running) return;
+    setSpeed();
     snake.running = true;
     snake.paused = false;
-    setSnakeSpeed();
     startSnakeLoop();
     el("snakeMsg").textContent = "Viel Erfolg! 🐍";
   }
+
   function pauseSnake(){
     if(!snake.running) return;
     snake.paused = !snake.paused;
@@ -1250,16 +1515,7 @@ Viel Erfolg! 🎄`;
     snake.paused=false;
     const score = snake.score;
     el("snakeMsg").textContent = `Game Over. Score: ${score}`;
-
-    const s = load();
-    const prevHS = s.game.snakeHighScore||0;
-    if(score > prevHS){
-      s.game.snakeHighScore = score;
-      gainRewards(s, 60, 20, `Snake: Neuer Highscore (${score})`);
-      unlock(s,"snakeHS");
-    }
-    save(s);
-    render();
+    handleSnakeRunComplete(score);
   }
 
   function stepSnake(){
@@ -1273,14 +1529,33 @@ Viel Erfolg! 🎄`;
     const head = snake.body[0];
     const nh = {x: head.x + snake.dir.x, y: head.y + snake.dir.y};
 
-    if(nh.x<0 || nh.y<0 || nh.x>=snake.grid || nh.y>=snake.grid) return gameOver();
-    if(snake.body.some(p=>p.x===nh.x && p.y===nh.y)) return gameOver();
+    // Walls vs Wrap-around
+    if(snake.wrap){
+      if(nh.x < 0) nh.x = snake.grid - 1;
+      if(nh.x >= snake.grid) nh.x = 0;
+      if(nh.y < 0) nh.y = snake.grid - 1;
+      if(nh.y >= snake.grid) nh.y = 0;
+    } else {
+      if(nh.x<0 || nh.y<0 || nh.x>=snake.grid || nh.y>=snake.grid){
+        return gameOver();
+      }
+    }
+
+    if(snake.body.some(p=>p.x===nh.x && p.y===nh.y)){
+      return gameOver();
+    }
 
     snake.body.unshift(nh);
 
     if(nh.x===snake.food.x && nh.y===snake.food.y){
       snake.score += 1;
       randFood();
+
+      // apply ramp immediately
+      if(snake.running){
+        stopSnakeLoop();
+        startSnakeLoop();
+      }
     } else {
       snake.body.pop();
     }
@@ -1293,7 +1568,6 @@ Viel Erfolg! 🎄`;
     const canvas = el("snakeCanvas");
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0,0,canvas.width,canvas.height);
-
     ctx.fillStyle = "#fff";
     ctx.fillRect(0,0,canvas.width,canvas.height);
 
@@ -1313,52 +1587,618 @@ Viel Erfolg! 🎄`;
     });
   }
 
-  function setSnakeDir(dir){
-    const map = {
-      up:{x:0,y:-1},
-      down:{x:0,y:1},
-      left:{x:-1,y:0},
-      right:{x:1,y:0},
-    };
-    if(map[dir]) snake.nextDir = map[dir];
+  function handleSnakeRunComplete(score){
+    const s = load();
+
+    const prevHS = s.game.snakeHighScore||0;
+    if(score > prevHS){
+      s.game.snakeHighScore = score;
+      gainRewards(s, 60, 20, `Snake: Neuer Highscore (${score})`);
+      unlock(s, "snakeHS");
+    }
+
+    if(score >= 5) unlock(s, "snake5");
+    if(score >= 20) unlock(s, "snake20");
+
+    const today = todayISO();
+    const dailyAlreadyDone = (s.game.snakeLastDailyDone === today);
+    const dailyEnabled = (s.game.snakeDailyEnabled!==false);
+
+    if(s.game.snakePendingDaily && dailyEnabled && !dailyAlreadyDone){
+      if(score >= 5){
+        s.game.snakeLastDailyDone = today;
+        s.game.snakePendingDaily = false;
+
+        const qid = "snakeDaily-" + today;
+        const q = (s.quests||[]).find(x=>x.id===qid);
+        if(q){ q.done = true; }
+
+        s.stats.done += 1;
+        gainRewards(s, 25, 8, `Daily abgeschlossen: Snake-Run (${score} Punkte)`);
+      } else {
+        el("snakeMsg").textContent = `Daily noch nicht geschafft (mind. 5 Punkte). Versuche es erneut!`;
+      }
+    }
+
+    save(s);
+    render();
   }
 
-  // keyboard controls
-  window.addEventListener("keydown",(e)=>{
-    if(load().ui.tab !== "snake") return;
-    const k = e.key.toLowerCase();
-    if(k==="arrowup"||k==="w") setSnakeDir("up");
-    if(k==="arrowdown"||k==="s") setSnakeDir("down");
-    if(k==="arrowleft"||k==="a") setSnakeDir("left");
-    if(k==="arrowright"||k==="d") setSnakeDir("right");
-    if(["arrowup","arrowdown","arrowleft","arrowright","w","a","s","d"].includes(k)) e.preventDefault();
+  el("snakeClaim").addEventListener("click", ()=>{
+    const s=load();
+    if(s.game.snakeLastDailyDone === todayISO()){
+      el("snakeMsg").textContent = "Daily ist heute schon erledigt ✅";
+      return;
+    }
+    if(!s.game.snakePendingDaily){
+      el("snakeMsg").textContent = "Tipp: Starte die Daily-Quest über die Quest-Liste („Daily: Snake-Run“ → Spielen).";
+    } else {
+      el("snakeMsg").textContent = "Daily ist aktiv. Spiel eine Runde (mind. 5 Punkte) und beende sie.";
+    }
   });
 
-  // touch D-pad (pointer)
-  $$(".dpad button[data-dir]").forEach(btn=>{
-    const dir = btn.getAttribute("data-dir");
-    const handler = (e)=>{ e.preventDefault(); setSnakeDir(dir); };
-    btn.addEventListener("pointerdown", handler, {passive:false});
-  });
-
-  el("snakeStart").addEventListener("click", startSnake);
+  el("snakeStart").addEventListener("click", ()=>{ setSpeed(); startSnake(); });
   el("snakePause").addEventListener("click", pauseSnake);
-  el("snakeReset").addEventListener("click", ()=>{ stopSnakeLoop(); snake.running=false; resetSnake(); });
-  el("snakeSpeed").addEventListener("change", setSnakeSpeed);
+  el("snakeReset").addEventListener("click", ()=>{ stopSnakeLoop(); snake.running=false; resetRun(); });
+  el("snakeSpeed").addEventListener("change", setSpeed);
 
-  // ------------------------------
-  // PWA / Service worker
-  // ------------------------------
-  if("serviceWorker" in navigator){
-    window.addEventListener("load", ()=>{
-      navigator.serviceWorker.register("./sw.js").catch(()=>{});
-    });
+  // Keyboard controls
+  window.addEventListener("keydown", (e)=>{
+    const k = e.key.toLowerCase();
+    let d=null;
+    if(k==="arrowup" || k==="w") d={x:0,y:-1};
+    if(k==="arrowdown" || k==="s") d={x:0,y:1};
+    if(k==="arrowleft" || k==="a") d={x:-1,y:0};
+    if(k==="arrowright" || k==="d") d={x:1,y:0};
+    if(d){
+      snake.nextDir = d;
+      e.preventDefault();
+    }
+  });
+
+  // =========================
+  // SNAKE: Resize + Touch + D-Pad
+  // =========================
+  function resizeSnakeCanvas(){
+    const canvas = el("snakeCanvas");
+    if(!canvas) return;
+
+    const max = Math.min(Math.floor(window.innerWidth * 0.96), 520);
+    const size = Math.max(320, max);
+
+    canvas.width = size;
+    canvas.height = size;
+
+    snake.cell = Math.floor(size / snake.grid);
+    drawSnake();
+  }
+  window.addEventListener("resize", resizeSnakeCanvas);
+
+  (function setupSnakeTouch(){
+    const canvas = el("snakeCanvas");
+    if(!canvas) return;
+
+    let startX=0, startY=0, startT=0;
+
+    canvas.addEventListener("touchstart", (e)=>{
+      const t = e.touches[0];
+      startX = t.clientX; startY = t.clientY; startT = Date.now();
+    }, {passive:true});
+
+    canvas.addEventListener("touchmove", (e)=>{ e.preventDefault(); }, {passive:false});
+
+    canvas.addEventListener("touchend", (e)=>{
+      const dx = (e.changedTouches[0].clientX - startX);
+      const dy = (e.changedTouches[0].clientY - startY);
+      const dt = Date.now() - startT;
+
+      if(dt > 700) return;
+      if(Math.abs(dx) < 18 && Math.abs(dy) < 18) return;
+
+      if(Math.abs(dx) > Math.abs(dy)){
+        snake.nextDir = dx > 0 ? {x:1,y:0} : {x:-1,y:0};
+      } else {
+        snake.nextDir = dy > 0 ? {x:0,y:1} : {x:0,y:-1};
+      }
+    }, {passive:true});
+  })();
+
+  function bindBtn(id, dir){
+    const b = el(id);
+    if(!b) return;
+    const handler = (e)=>{ e.preventDefault(); snake.nextDir = dir; };
+    b.addEventListener("click", handler);
+    b.addEventListener("touchstart", handler, {passive:false});
+  }
+  bindBtn("btnUp", {x:0,y:-1});
+  bindBtn("btnDown", {x:0,y:1});
+  bindBtn("btnLeft", {x:-1,y:0});
+  bindBtn("btnRight", {x:1,y:0});
+
+  const pauseBtn = el("btnPause");
+  if(pauseBtn){
+    pauseBtn.addEventListener("click", (e)=>{ e.preventDefault(); pauseSnake(); });
+    pauseBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); pauseSnake(); }, {passive:false});
   }
 
-  // ------------------------------
-  // Init
-  // ------------------------------
-  resetSnake();
+  // --- QR generator (embedded, based on classic qrcode-generator approach) ---
+  const QRErrorCorrectLevel = { L:1, M:0, Q:3, H:2 };
+
+  function QRCodeModel(typeNumber, errorCorrectLevel) {
+    let _typeNumber = typeNumber;
+    let _errorCorrectLevel = errorCorrectLevel;
+    let _modules = null;
+    let _moduleCount = 0;
+    let _dataCache = null;
+    let _dataList = [];
+
+    const PAD0 = 0xEC;
+    const PAD1 = 0x11;
+
+    function _makeImpl(test, maskPattern) {
+      _moduleCount = _typeNumber * 4 + 17;
+      _modules = new Array(_moduleCount);
+      for (let row = 0; row < _moduleCount; row++) {
+        _modules[row] = new Array(_moduleCount);
+        for (let col = 0; col < _moduleCount; col++) {
+          _modules[row][col] = null;
+        }
+      }
+
+      _setupPositionProbePattern(0, 0);
+      _setupPositionProbePattern(_moduleCount - 7, 0);
+      _setupPositionProbePattern(0, _moduleCount - 7);
+      _setupPositionAdjustPattern();
+      _setupTimingPattern();
+      _setupTypeInfo(test, maskPattern);
+
+      if (_typeNumber >= 7) {
+        _setupTypeNumber(test);
+      }
+
+      if (_dataCache == null) {
+        _dataCache = _createData(_typeNumber, _errorCorrectLevel, _dataList);
+      }
+
+      _mapData(_dataCache, maskPattern);
+    }
+
+    function _setupPositionProbePattern(row, col) {
+      for (let r = -1; r <= 7; r++) {
+        if (row + r <= -1 || _moduleCount <= row + r) continue;
+        for (let c = -1; c <= 7; c++) {
+          if (col + c <= -1 || _moduleCount <= col + c) continue;
+          if ((0 <= r && r <= 6 && (c == 0 || c == 6)) ||
+              (0 <= c && c <= 6 && (r == 0 || r == 6)) ||
+              (2 <= r && r <= 4 && 2 <= c && c <= 4)) {
+            _modules[row + r][col + c] = true;
+          } else {
+            _modules[row + r][col + c] = false;
+          }
+        }
+      }
+    }
+
+    function _getBestMaskPattern() {
+      let minLostPoint = 0;
+      let pattern = 0;
+      for (let i = 0; i < 8; i++) {
+        _makeImpl(true, i);
+        let lostPoint = QRUtil.getLostPoint({getModuleCount:()=>_moduleCount,isDark:(r,c)=>_modules[r][c]});
+        if (i == 0 || minLostPoint > lostPoint) {
+          minLostPoint = lostPoint;
+          pattern = i;
+        }
+      }
+      return pattern;
+    }
+
+    function _setupTimingPattern() {
+      for (let r = 8; r < _moduleCount - 8; r++) {
+        if (_modules[r][6] != null) continue;
+        _modules[r][6] = (r % 2 == 0);
+      }
+      for (let c = 8; c < _moduleCount - 8; c++) {
+        if (_modules[6][c] != null) continue;
+        _modules[6][c] = (c % 2 == 0);
+      }
+    }
+
+    function _setupPositionAdjustPattern() {
+      const pos = QRUtil.getPatternPosition(_typeNumber);
+      for (let i = 0; i < pos.length; i++) {
+        for (let j = 0; j < pos.length; j++) {
+          const row = pos[i];
+          const col = pos[j];
+          if (_modules[row][col] != null) continue;
+          for (let r = -2; r <= 2; r++) {
+            for (let c = -2; c <= 2; c++) {
+              if (r == -2 || r == 2 || c == -2 || c == 2 ||
+                  (r == 0 && c == 0)) {
+                _modules[row + r][col + c] = true;
+              } else {
+                _modules[row + r][col + c] = false;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    function _setupTypeNumber(test) {
+      const bits = QRUtil.getBCHTypeNumber(_typeNumber);
+      for (let i = 0; i < 18; i++) {
+        const mod = (!test && ((bits >> i) & 1) == 1);
+        _modules[Math.floor(i / 3)][i % 3 + _moduleCount - 8 - 3] = mod;
+      }
+      for (let i = 0; i < 18; i++) {
+        const mod = (!test && ((bits >> i) & 1) == 1);
+        _modules[i % 3 + _moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+      }
+    }
+
+    function _setupTypeInfo(test, maskPattern) {
+      const data = (_errorCorrectLevel << 3) | maskPattern;
+      const bits = QRUtil.getBCHTypeInfo(data);
+
+      for (let i = 0; i < 15; i++) {
+        const mod = (!test && ((bits >> i) & 1) == 1);
+        if (i < 6) _modules[i][8] = mod;
+        else if (i < 8) _modules[i + 1][8] = mod;
+        else _modules[_moduleCount - 15 + i][8] = mod;
+      }
+
+      for (let i = 0; i < 15; i++) {
+        const mod = (!test && ((bits >> i) & 1) == 1);
+        if (i < 8) _modules[8][_moduleCount - i - 1] = mod;
+        else if (i < 9) _modules[8][15 - i - 1 + 1] = mod;
+        else _modules[8][15 - i - 1] = mod;
+      }
+
+      _modules[_moduleCount - 8][8] = (!test);
+    }
+
+    function _mapData(data, maskPattern) {
+      let inc = -1;
+      let row = _moduleCount - 1;
+      let bitIndex = 7;
+      let byteIndex = 0;
+
+      for (let col = _moduleCount - 1; col > 0; col -= 2) {
+        if (col == 6) col--;
+        while (true) {
+          for (let c = 0; c < 2; c++) {
+            if (_modules[row][col - c] == null) {
+              let dark = false;
+              if (byteIndex < data.length) {
+                dark = (((data[byteIndex] >>> bitIndex) & 1) == 1);
+              }
+              const mask = QRUtil.getMask(maskPattern, row, col - c);
+              if (mask) dark = !dark;
+              _modules[row][col - c] = dark;
+              bitIndex--;
+              if (bitIndex == -1) {
+                byteIndex++;
+                bitIndex = 7;
+              }
+            }
+          }
+          row += inc;
+          if (row < 0 || _moduleCount <= row) {
+            row -= inc;
+            inc = -inc;
+            break;
+          }
+        }
+      }
+    }
+
+    function _createData(typeNumber, errorCorrectLevel, dataList) {
+      const rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+
+      const buffer = new QRBitBuffer();
+      for (let i = 0; i < dataList.length; i++) {
+        const data = dataList[i];
+        buffer.put(data.getMode(), 4);
+        buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber));
+        data.write(buffer);
+      }
+
+      let totalDataCount = 0;
+      for (let i = 0; i < rsBlocks.length; i++) totalDataCount += rsBlocks[i].dataCount;
+
+      if (buffer.getLengthInBits() > totalDataCount * 8) throw new Error("Code too long");
+
+      if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) buffer.put(0, 4);
+
+      while (buffer.getLengthInBits() % 8 != 0) buffer.putBit(false);
+
+      while (true) {
+        if (buffer.getLengthInBits() >= totalDataCount * 8) break;
+        buffer.put(PAD0, 8);
+        if (buffer.getLengthInBits() >= totalDataCount * 8) break;
+        buffer.put(PAD1, 8);
+      }
+
+      return QRCodeModel.createBytes(buffer, rsBlocks);
+    }
+
+    return {
+      addData : function(data) {
+        const newData = new QR8BitByte(data);
+        _dataList.push(newData);
+        _dataCache = null;
+      },
+      isDark : function(row, col) {
+        if (_modules[row][col] != null) return _modules[row][col];
+        else return false;
+      },
+      getModuleCount : function() { return _moduleCount; },
+      make : function() {
+        if (_typeNumber < 1) {
+          _typeNumber = 1;
+          for (; _typeNumber <= 7; _typeNumber++) {
+            const rsBlocks = QRRSBlock.getRSBlocks(_typeNumber, _errorCorrectLevel);
+            let totalDataCount = 0;
+            for (let i = 0; i < rsBlocks.length; i++) totalDataCount += rsBlocks[i].dataCount;
+            const buffer = new QRBitBuffer();
+            for (let i = 0; i < _dataList.length; i++) {
+              const data = _dataList[i];
+              buffer.put(data.getMode(), 4);
+              buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), _typeNumber));
+              data.write(buffer);
+            }
+            if (buffer.getLengthInBits() <= totalDataCount * 8) break;
+          }
+        }
+        _makeImpl(false, _getBestMaskPattern());
+      }
+    };
+  }
+
+  QRCodeModel.createBytes = function(buffer, rsBlocks) {
+    let offset = 0;
+    let maxDcCount = 0;
+    let maxEcCount = 0;
+
+    const dcdata = new Array(rsBlocks.length);
+    const ecdata = new Array(rsBlocks.length);
+
+    for (let r = 0; r < rsBlocks.length; r++) {
+      const dcCount = rsBlocks[r].dataCount;
+      const ecCount = rsBlocks[r].totalCount - dcCount;
+
+      maxDcCount = Math.max(maxDcCount, dcCount);
+      maxEcCount = Math.max(maxEcCount, ecCount);
+
+      dcdata[r] = new Array(dcCount);
+      for (let i = 0; i < dcdata[r].length; i++) dcdata[r][i] = 0xff & buffer.buffer[i + offset];
+      offset += dcCount;
+
+      const rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+      const rawPoly = new QRPolynomial(dcdata[r], rsPoly.getLength() - 1);
+      const modPoly = rawPoly.mod(rsPoly);
+
+      ecdata[r] = new Array(rsPoly.getLength() - 1);
+      for (let i = 0; i < ecdata[r].length; i++) {
+        const modIndex = i + modPoly.getLength() - ecdata[r].length;
+        ecdata[r][i] = (modIndex >= 0) ? modPoly.get(modIndex) : 0;
+      }
+    }
+
+    let totalCodeCount = 0;
+    for (let i = 0; i < rsBlocks.length; i++) totalCodeCount += rsBlocks[i].totalCount;
+
+    const data = new Array(totalCodeCount);
+    let index = 0;
+
+    for (let i = 0; i < maxDcCount; i++) {
+      for (let r = 0; r < rsBlocks.length; r++) {
+        if (i < dcdata[r].length) data[index++] = dcdata[r][i];
+      }
+    }
+
+    for (let i = 0; i < maxEcCount; i++) {
+      for (let r = 0; r < rsBlocks.length; r++) {
+        if (i < ecdata[r].length) data[index++] = ecdata[r][i];
+      }
+    }
+
+    return data;
+  };
+
+  function QRRSBlock(totalCount, dataCount) { this.totalCount = totalCount; this.dataCount = dataCount; }
+  QRRSBlock.getRSBlocks = function(typeNumber, errorCorrectLevel) {
+    const rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
+    if (typeof rsBlock == 'undefined') throw new Error("RS block undefined");
+    const length = rsBlock.length / 3;
+    const list = [];
+    for (let i = 0; i < length; i++) {
+      const count = rsBlock[i*3+0];
+      const totalCount = rsBlock[i*3+1];
+      const dataCount = rsBlock[i*3+2];
+      for (let j = 0; j < count; j++) list.push(new QRRSBlock(totalCount, dataCount));
+    }
+    return list;
+  };
+  QRRSBlock.getRsBlockTable = function(typeNumber, errorCorrectLevel) {
+    const T = {
+      1: [1,26,16],
+      2: [1,44,28],
+      3: [1,70,44],
+      4: [1,100,64],
+      5: [1,134,86],
+      6: [2,86,54],
+      7: [2,98,62]
+    };
+    if(!T[typeNumber]) throw new Error("Link zu lang für Offline-QR (bitte URL kürzen)");
+    return T[typeNumber];
+  };
+
+  const QRMode = { MODE_8BIT_BYTE: 1<<2 };
+
+  function QR8BitByte(data) {
+    this.mode = QRMode.MODE_8BIT_BYTE;
+    this.data = data;
+    this.getMode = ()=> this.mode;
+    this.getLength = ()=> this.data.length;
+    this.write = (buffer)=>{
+      for (let i = 0; i < this.data.length; i++) buffer.put(this.data.charCodeAt(i), 8);
+    };
+  }
+
+  function QRBitBuffer() {
+    this.buffer = [];
+    this.length = 0;
+    this.get = (index)=>{
+      const bufIndex = Math.floor(index / 8);
+      return ((this.buffer[bufIndex] >>> (7 - index % 8)) & 1) == 1;
+    };
+    this.put = (num, length)=>{
+      for (let i = 0; i < length; i++) this.putBit(((num >>> (length - i - 1)) & 1) == 1);
+    };
+    this.getLengthInBits = ()=> this.length;
+    this.putBit = (bit)=>{
+      const bufIndex = Math.floor(this.length / 8);
+      if (this.buffer.length <= bufIndex) this.buffer.push(0);
+      if (bit) this.buffer[bufIndex] |= (0x80 >>> (this.length % 8));
+      this.length++;
+    };
+  }
+
+  function QRPolynomial(num, shift) {
+    let offset = 0;
+    while (offset < num.length && num[offset] == 0) offset++;
+    this.num = new Array(num.length - offset + shift);
+    for (let i = 0; i < num.length - offset; i++) this.num[i] = num[i + offset];
+    this.get = (index)=> this.num[index];
+    this.getLength = ()=> this.num.length;
+    this.multiply = (e)=>{
+      const num = new Array(this.getLength() + e.getLength() - 1).fill(0);
+      for (let i = 0; i < this.getLength(); i++) {
+        for (let j = 0; j < e.getLength(); j++) {
+          num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i)) + QRMath.glog(e.get(j)));
+        }
+      }
+      return new QRPolynomial(num, 0);
+    };
+    this.mod = (e)=>{
+      if (this.getLength() - e.getLength() < 0) return this;
+      const ratio = QRMath.glog(this.get(0)) - QRMath.glog(e.get(0));
+      const num = this.num.slice();
+      for (let i = 0; i < e.getLength(); i++) num[i] ^= QRMath.gexp(QRMath.glog(e.get(i)) + ratio);
+      return new QRPolynomial(num, 0).mod(e);
+    };
+  }
+
+  const QRMath = (function(){
+    const EXP_TABLE = new Array(256);
+    const LOG_TABLE = new Array(256);
+    for (let i = 0; i < 8; i++) EXP_TABLE[i] = 1 << i;
+    for (let i = 8; i < 256; i++) EXP_TABLE[i] = EXP_TABLE[i-4] ^ EXP_TABLE[i-5] ^ EXP_TABLE[i-6] ^ EXP_TABLE[i-8];
+    for (let i = 0; i < 255; i++) LOG_TABLE[EXP_TABLE[i]] = i;
+    return {
+      glog: (n)=>{ if (n < 1) throw new Error("glog"); return LOG_TABLE[n]; },
+      gexp: (n)=>{ while (n < 0) n += 255; while (n >= 256) n -= 255; return EXP_TABLE[n]; }
+    };
+  })();
+
+  const QRUtil = {
+    PATTERN_POSITION_TABLE: [
+      [], [6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50]
+    ],
+    G15: (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0),
+    G18: (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0),
+    G15_MASK: (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1),
+    getBCHTypeInfo: function(data) {
+      let d = data << 10;
+      while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
+        d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15)));
+      }
+      return ((data << 10) | d) ^ QRUtil.G15_MASK;
+    },
+    getBCHTypeNumber: function(data) {
+      let d = data << 12;
+      while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
+        d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18)));
+      }
+      return (data << 12) | d;
+    },
+    getBCHDigit: function(data) {
+      let digit = 0;
+      while (data != 0) { digit++; data >>>= 1; }
+      return digit;
+    },
+    getPatternPosition: function(typeNumber) {
+      return QRUtil.PATTERN_POSITION_TABLE[typeNumber] || QRUtil.PATTERN_POSITION_TABLE[9];
+    },
+    getMask: function(maskPattern, i, j) {
+      switch (maskPattern) {
+        case 0: return (i + j) % 2 == 0;
+        case 1: return i % 2 == 0;
+        case 2: return j % 3 == 0;
+        case 3: return (i + j) % 3 == 0;
+        case 4: return (Math.floor(i / 2) + Math.floor(j / 3)) % 2 == 0;
+        case 5: return (i * j) % 2 + (i * j) % 3 == 0;
+        case 6: return ((i * j) % 2 + (i * j) % 3) % 2 == 0;
+        case 7: return ((i * j) % 3 + (i + j) % 2) % 2 == 0;
+        default: return false;
+      }
+    },
+    getErrorCorrectPolynomial: function(errorCorrectLength) {
+      let a = new QRPolynomial([1], 0);
+      for (let i = 0; i < errorCorrectLength; i++) a = a.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0));
+      return a;
+    },
+    getLengthInBits: function(mode, type) {
+      if (1 <= type && type < 10) return 8;
+      return 16;
+    },
+    getLostPoint: function(qrCode) {
+      const moduleCount = qrCode.getModuleCount();
+      let lostPoint = 0;
+
+      for (let row = 0; row < moduleCount; row++) {
+        for (let col = 0; col < moduleCount; col++) {
+          let sameCount = 0;
+          const dark = qrCode.isDark(row, col);
+          for (let r = -1; r <= 1; r++) {
+            if (row + r < 0 || moduleCount <= row + r) continue;
+            for (let c = -1; c <= 1; c++) {
+              if (col + c < 0 || moduleCount <= col + c) continue;
+              if (r == 0 && c == 0) continue;
+              if (dark == qrCode.isDark(row + r, col + c)) sameCount++;
+            }
+          }
+          if (sameCount > 5) lostPoint += (3 + sameCount - 5);
+        }
+      }
+
+      for (let row = 0; row < moduleCount - 1; row++) {
+        for (let col = 0; col < moduleCount - 1; col++) {
+          let count = 0;
+          if (qrCode.isDark(row, col)) count++;
+          if (qrCode.isDark(row + 1, col)) count++;
+          if (qrCode.isDark(row, col + 1)) count++;
+          if (qrCode.isDark(row + 1, col + 1)) count++;
+          if (count == 0 || count == 4) lostPoint += 3;
+        }
+      }
+      return lostPoint;
+    }
+  };
+
+  // --- Boot ---
+  clearCustomForm();
+  resetRun();
+  resizeSnakeCanvas();
+  drawQRToCanvas("", el("qrCanvas"));
+
+  const s0 = load();
+  if(!s0.gift.story) s0.gift.story = defaultStoryTemplate((s0.gift.recipientName||"").trim());
+  if(!s0.gift.shareUrl) s0.gift.shareUrl = guessDefaultUrl();
+  save(s0);
+
   render();
 </script>
 </body>
